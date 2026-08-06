@@ -1,0 +1,2657 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comissões Infra — CONNECT</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #181c27;
+    --card:      #1e2333;
+    --border:    #2a3045;
+    --accent:    #3b82f6;
+    --accent2:   #10b981;
+    --warn:      #f59e0b;
+    --danger:    #ef4444;
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+    --subtle:    #94a3b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .logo span { color: var(--subtle); font-weight: 400; }
+  .badge-mes {
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(59,130,246,.15);
+    border: 1px solid rgba(59,130,246,.3);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  /* ── Layout ── */
+  .layout { display: flex; height: calc(100vh - 56px); }
+
+  nav {
+    width: 200px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  nav button {
+    width: 100%;
+    text-align: left;
+    padding: 9px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--subtle);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all .15s;
+    border-left: 3px solid transparent;
+  }
+  nav button:hover { color: var(--text); background: rgba(255,255,255,.04); }
+  nav button.active {
+    color: var(--accent);
+    background: rgba(59,130,246,.08);
+    border-left-color: var(--accent);
+  }
+  nav .nav-icon { margin-right: 8px; opacity: .7; }
+
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  /* ── Tabs ── */
+  .tab { display: none; }
+  .tab.active { display: block; }
+
+  /* ── Section titles ── */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  .section-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* ── KPI row ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .kpi {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .kpi-label { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+  .kpi-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .kpi-value.green { color: var(--accent2); }
+  .kpi-value.blue  { color: var(--accent); }
+  .kpi-value.amber { color: var(--warn); }
+
+  /* ── Tabelas ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    padding: 9px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    color: var(--subtle);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.025); }
+  td.num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-align: right;
+  }
+  td.num.pos { color: var(--accent2); }
+  td.num.neg { color: var(--danger); }
+  td.num.accent { color: var(--accent); }
+  td.tag {
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: .04em;
+  }
+  .pill-blue  { background: rgba(59,130,246,.15); color: var(--accent); }
+  .pill-green { background: rgba(16,185,129,.15); color: var(--accent2); }
+  .pill-amber { background: rgba(245,158,11,.15); color: var(--warn); }
+  .pill-red   { background: rgba(239,68,68,.15); color: var(--danger); }
+
+  tr.total-row td {
+    font-weight: 700;
+    color: var(--text);
+    border-top: 1px solid var(--border);
+    background: rgba(255,255,255,.02);
+  }
+
+  /* ── Formulário de lançamento ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .form-group input,
+  .form-group select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color .15s;
+    width: 100%;
+  }
+  .form-group input:focus,
+  .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--surface); }
+
+  .tecnico-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-danger  { background: rgba(239,68,68,.15); color: var(--danger); border: 1px solid rgba(239,68,68,.3); }
+  .btn-danger:hover { background: rgba(239,68,68,.25); }
+  .btn-sm { font-size: 11px; padding: 4px 10px; }
+
+  .info-box {
+    background: rgba(59,130,246,.08);
+    border: 1px solid rgba(59,130,246,.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--subtle);
+    margin-bottom: 16px;
+    line-height: 1.7;
+  }
+
+  /* ── Valores progressivos ── */
+  .progress-table th, .progress-table td { text-align: center; }
+  .progress-table th:first-child, .progress-table td:first-child { text-align: left; }
+
+  /* ── Resumo ── */
+  .resumo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  /* ── Bônus ── */
+  .bonus-form { display: grid; grid-template-columns: 1fr 1fr 2fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 14px; }
+
+  /* ── Empty state ── */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .empty-icon { font-size: 32px; margin-bottom: 10px; opacity: .4; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--accent2);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: all .2s;
+    z-index: 9999;
+  }
+  .toast.show { opacity: 1; transform: none; }
+
+  @media (max-width: 768px) {
+    nav { width: 52px; }
+    nav button { padding: 10px 14px; }
+    nav .nav-label { display: none; }
+    .bonus-form { grid-template-columns: 1fr 1fr; }
+    .tecnico-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ── Importação ── */
+  .import-drop {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 28px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .import-drop input[type="file"] { color: var(--subtle); font-size: 13px; }
+  .map-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 10px 16px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .map-grid label { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .map-grid select {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 13px; padding: 7px 10px;
+  }
+  .status-ok    { color: var(--accent2); font-weight: 600; }
+  .status-warn  { color: var(--warn); font-weight: 600; }
+  .fix-select {
+    background: var(--bg); border: 1px solid var(--warn); border-radius: 6px;
+    color: var(--text); font-size: 12px; padding: 4px 6px;
+  }
+  .import-log { max-height: 320px; overflow-y: auto; }
+
+/* ── Comprovante ── */
+.recibo {
+  background: #fff;
+  color: #111;
+  border-radius: 8px;
+  padding: 32px 36px;
+  max-width: 820px;
+  margin: 16px auto;
+  box-shadow: 0 4px 18px rgba(0,0,0,.15);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.recibo h2 { margin: 0 0 4px; font-size: 22px; color: #111; }
+.recibo .rec-sub { color: #555; font-size: 13px; margin-bottom: 20px; }
+.recibo .rec-info { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; font-size: 13px; margin-bottom: 18px; padding: 12px 14px; background: #f5f7fa; border-radius: 6px; }
+.recibo .rec-info b { color: #111; }
+.recibo table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+.recibo th, .recibo td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; color: #222; }
+.recibo th { background: #eef2f7; font-weight: 600; }
+.recibo td.num, .recibo th.num { text-align: right; font-family: 'JetBrains Mono', monospace; }
+.recibo .sec-title { font-weight: 700; font-size: 14px; color: #111; margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #333; }
+.recibo .totais { margin-top: 8px; padding: 14px 16px; background: #f5f7fa; border-radius: 6px; font-size: 13px; }
+.recibo .totais .lin { display: flex; justify-content: space-between; padding: 3px 0; }
+.recibo .totais .liquido { font-weight: 800; font-size: 16px; color: #111; border-top: 1px solid #ccc; margin-top: 6px; padding-top: 8px; }
+.recibo .neg { color: #b91c1c; }
+.recibo .pos { color: #047857; }
+.recibo .assin {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.recibo .assin .box { text-align: center; font-size: 12px; color: #444; }
+.recibo .assin .linha { border-top: 1px solid #333; margin-bottom: 6px; height: 42px; }
+.recibo .declaracao { margin-top: 22px; padding: 10px 12px; font-size: 12px; color: #333; background: #fffbea; border-left: 3px solid #f59e0b; border-radius: 4px; }
+
+@media print {
+  body * { visibility: hidden !important; }
+  #print-area, #print-area * { visibility: visible !important; }
+  #print-area { position: absolute; inset: 0; margin: 0; padding: 0; background: #fff; }
+  .recibo { box-shadow: none; margin: 0; max-width: none; page-break-after: always; }
+  .recibo:last-child { page-break-after: auto; }
+}
+@page { size: A4; margin: 14mm; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">CONNECT <span>/ Comissões Infra</span></div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <div class="badge-mes" id="badge-mes">Junho 2025</div>
+    <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted,#94a3b8);">
+      <div id="sync-dot" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#94a3b8;"></div>
+      <span id="sync-label">Sheets não configurado</span>
+    </div>
+    <div id="sheets-status" style="font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.03em; display:none;"></div>
+  </div>
+</header>
+
+<style>
+@keyframes sync-pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+.dot-green { background:#10b981 !important; animation: sync-pulse 2s infinite; }
+.dot-amber { background:#f59e0b !important; animation: sync-pulse 1s infinite; }
+.dot-red   { background:#ef4444 !important; }
+.dot-gray  { background:#94a3b8 !important; }
+</style>
+
+<div class="layout">
+  <nav>
+    <button class="active" onclick="showTab('lancamentos')">
+      <span class="nav-icon">📋</span><span class="nav-label">Lançamentos</span>
+    </button>
+    <button onclick="showTab('importar')">
+      <span class="nav-icon">📥</span><span class="nav-label">Importar</span>
+    </button>
+    <button onclick="showTab('resumo')">
+      <span class="nav-icon">📊</span><span class="nav-label">Resumo</span>
+    </button>
+    <button onclick="showTab('bonus')">
+      <span class="nav-icon">⭐</span><span class="nav-label">Bônus</span>
+    </button>
+    <button onclick="showTab('comprovantes')">
+      <span class="nav-icon">🧾</span><span class="nav-label">Comprovantes</span>
+    </button>
+    <button onclick="showTab('tabela')">
+      <span class="nav-icon">💰</span><span class="nav-label">Tabela</span>
+    </button>
+    <button onclick="showTab('config')">
+      <span class="nav-icon">⚙️</span><span class="nav-label">Configurações</span>
+    </button>
+    <button onclick="showTab('conferencia')">
+      <span class="nav-icon">🔍</span><span class="nav-label">Conferência</span>
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- ═══════════════════════════════════ LANÇAMENTOS ═══════════════════════════════════ -->
+    <div class="tab active" id="tab-lancamentos">
+      <div class="section-title">Lançamento de Serviços</div>
+      <div class="section-sub">Registre cada O.S. — os valores são calculados automaticamente conforme a tabela de comissões.</div>
+
+      <div class="card">
+        <div class="card-title">Novo lançamento</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="f-data">
+          </div>
+          <div class="form-group">
+            <label>Cód. O.S.</label>
+            <input type="text" id="f-os" placeholder="Ex: 12345">
+          </div>
+          <div class="form-group">
+            <label>Nome / Local</label>
+            <input type="text" id="f-local" placeholder="Ex: João Silva — Bairro X">
+          </div>
+          <div class="form-group">
+            <label>Origem</label>
+            <select id="f-origem">
+              <option value="">Selecione…</option>
+              <option>Provedor</option>
+              <option>Condomínio / O.S. Externa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tipo de O.S.</label>
+            <select id="f-tipo">
+              <option value="">Selecione…</option>
+              <option>Instalação</option>
+              <option>Manutenção</option>
+              <option>Infraestrutura</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Serviço</label>
+            <select id="f-servico" onchange="onServicoChange()">
+              <option value="">Selecione…</option>
+              <optgroup label="── Serviços Fixos ──">
+                <option value="FIXO - SHOPPING">Instalação Shopping (R$ 40,00)</option>
+                <option value="FIXO - DEDICADO">Instalação Link Dedicado (R$ 40,00)</option>
+                <option value="FIXO - CONDOMINIO 1 TORRE">Condomínio 1 Torre (R$ 200,00)</option>
+                <option value="FIXO - CONDOMINIO 2 TORRES">Condomínio 2 Torres (R$ 300,00)</option>
+                <option value="FIXO - CONDOMINIO 3 TORRES">Condomínio 3 Torres (R$ 380,00)</option>
+                <option value="FIXO - RESIDENCIAL">Instalação/Reinstalação Residencial (R$ 5,00)</option>
+                <option value="FIXO - MESH">Instalação/Retirada Mesh (R$ 5,00)</option>
+                <option value="FIXO - MUDANCA ENDERECO">Mudança de Endereço (R$ 5,00)</option>
+                <option value="FIXO - MUDANCA INTERNA">Mudança Interna de Equipamentos (R$ 5,00)</option>
+                <option value="FIXO - CABO TV">Cabo Para TV (R$ 2,00)</option>
+                <option value="FIXO - SINAL ALTO">Sinal Alto FTTH (R$ 2,00)</option>
+                <option value="FIXO - VERIFICACAO EXTERNA">Verificação Externa (R$ 2,00)</option>
+                <option value="FIXO - RETIRADA RAMAL">Retirada de Ramal (R$ 0,50)</option>
+                <option value="FIXO - CHAMADO">Chamados em Geral (R$ 2,00)</option>
+                <option value="FIXO - RESERVA OPTICA">Adesão Reserva Óptica (R$ 5,00)</option>
+              </optgroup>
+              <optgroup label="── Progressivos (NAP / Caixa Emenda / Bandeja) ──">
+                <option value="NAP">NAP (valor progressivo por quantidade no dia)</option>
+                <option value="EMENDA">Caixa de Emenda (valor progressivo)</option>
+                <option value="BANDEJA">Bandeja (valor progressivo)</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group" id="grp-qtd" style="display:none;">
+            <label>Qtd (unidades do item)</label>
+            <input type="number" id="f-qtd" min="1" value="1" placeholder="1" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label>Nº de Participantes</label>
+            <input type="number" id="f-npartic" min="1" value="1" placeholder="1" title="Informe o total de pessoas que participaram do procedimento (caso não queira selecionar cada nome)">
+          </div>
+        </div>
+
+        <!-- Serviços extras na mesma O.S. -->
+        <div class="card-title" style="margin-top:4px;">Serviços adicionais nesta O.S. <span style="color:var(--muted); font-weight:400; text-transform:none; letter-spacing:0;">(opcional — para mesclar múltiplos serviços na mesma O.S.)</span></div>
+        <div id="extras-container"></div>
+        <button class="btn btn-sm" style="background:rgba(16,185,129,.12); color:var(--accent2); border:1px solid rgba(16,185,129,.25); margin-bottom:16px;" onclick="addServicoExtra()">＋ Adicionar serviço extra na mesma O.S.</button>
+
+        <div class="card-title" style="margin-top:4px;">Técnico Principal e Ajudantes</div>
+        <div class="info-box">
+          Selecione o <strong>Técnico Principal</strong> e, se houver ajudantes, clique em <strong>+ Ajudante</strong> para nominar cada um. O valor será <strong>rateado igualmente</strong> entre todos os participantes marcados. Use o campo <strong>Nº de Participantes</strong> quando não quiser nomear cada ajudante individualmente.
+        </div>
+        <div id="tecs-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; align-items:flex-end;">
+          <!-- preenchido por JS em initTecsContainer() -->
+        </div>
+        <div style="margin-top:8px;">
+          <button type="button" class="btn btn-sm" style="background:rgba(148,163,184,.15); color:var(--text);" onclick="addAjudanteField()">＋ Ajudante</button>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-primary" id="btn-add" onclick="addLancamento()">＋ Adicionar lançamento</button>
+          <button class="btn btn-danger btn-sm" id="btn-cancel-edit" onclick="cancelEdit()" style="display:none;">Cancelar edição</button>
+          <span id="editing-indicator" style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--warn); display:none;">✎ Editando lançamento</span>
+          <span id="preview-valor" style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent2);"></span>
+        </div>
+      </div>
+
+      <!-- tabela de lançamentos -->
+      <div class="card">
+        <div class="resumo-header">
+          <div class="card-title" style="margin:0;">Lançamentos do período</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-danger btn-sm" onclick="clearAll()">Limpar tudo</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="tbl-lancamentos">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>O.S.</th>
+                <th>Local</th>
+                <th>Serviço</th>
+                <th>Faixa</th>
+                <th>Téc. Principal</th>
+                <th>Ajudantes</th>
+                <th style="text-align:right">Part.</th>
+                <th style="text-align:right">Valor Unit.</th>
+                <th style="text-align:right">Total</th>
+                <th style="text-align:right">Rateado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-lancamentos">
+              <tr><td colspan="12"><div class="empty"><div class="empty-icon">📋</div>Nenhum lançamento ainda. Preencha o formulário acima.</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ IMPORTAR ═══════════════════════════════════ -->
+    <div class="tab" id="tab-importar">
+      <div class="section-title">Importação em Massa</div>
+      <div class="section-sub">Suba um arquivo .xlsx, .xls ou .csv exportado da planilha de campo. Nenhum dado é enviado a servidor — tudo é processado no seu navegador.</div>
+
+      <div class="card">
+        <div class="card-title">1. Arquivo</div>
+        <div class="import-drop">
+          📄 Selecione a planilha (.xlsx, .xls, .csv)<br><br>
+          <input type="file" id="imp-file" accept=".xlsx,.xls,.csv" onchange="handleImportFile(event)">
+        </div>
+        <div id="imp-file-info" style="font-size:12px; color:var(--muted);"></div>
+      </div>
+
+      <div class="card" id="imp-map-card" style="display:none;">
+        <div class="card-title">2. Mapeamento de colunas</div>
+        <div class="section-sub" style="margin-bottom:14px;">Diga qual coluna da sua planilha corresponde a cada campo. Deixe "— não usar —" se não existir.</div>
+        <div class="map-grid" id="imp-map-grid"></div>
+        <button class="btn btn-primary" onclick="analisarImportacao()">Analisar dados</button>
+      </div>
+
+      <div class="card" id="imp-fix-card" style="display:none;">
+        <div class="card-title">3. Corrigir valores não reconhecidos</div>
+        <div class="section-sub" style="margin-bottom:14px;">Alguns valores da planilha não batem exatamente com a tabela de comissões ou com a lista de técnicos. Ajuste abaixo — a correção vale para todas as linhas com esse mesmo valor.</div>
+        <div id="imp-fix-body"></div>
+      </div>
+
+      <div class="card" id="imp-preview-card" style="display:none;">
+        <div class="resumo-header">
+          <div class="card-title" style="margin:0;">4. Prévia da importação</div>
+          <div id="imp-summary" style="font-size:12px; color:var(--muted);"></div>
+        </div>
+        <div class="table-wrap import-log">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Status</th><th>Data</th><th>Serviço</th><th>Qtd</th><th>Téc. Principal</th><th style="text-align:right">Valor</th></tr>
+            </thead>
+            <tbody id="imp-preview-body"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary" onclick="confirmarImportacao()">✔ Confirmar e lançar linhas válidas</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ RESUMO ═══════════════════════════════════ -->
+    <div class="tab" id="tab-resumo">
+      <div class="section-title">Resumo por Técnico</div>
+      <div class="section-sub">Consolidado automático — atualizado a cada lançamento.</div>
+
+      <div class="kpi-row" id="kpi-resumo">
+        <div class="kpi"><div class="kpi-label">Total de O.S.</div><div class="kpi-value blue" id="kpi-os">0</div></div>
+        <div class="kpi"><div class="kpi-label">Total a Pagar</div><div class="kpi-value green" id="kpi-total">R$ 0,00</div></div>
+        <div class="kpi"><div class="kpi-label">Com Bônus</div><div class="kpi-value amber" id="kpi-bonus">R$ 0,00</div></div>
+        <div class="kpi"><div class="kpi-label">Técnicos Ativos</div><div class="kpi-value" id="kpi-ativos">0</div></div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Técnico</th>
+                <th style="text-align:right">Serv. Provedor</th>
+                <th style="text-align:right">Serv. Cond./O.S.</th>
+                <th style="text-align:right">Total Serviços</th>
+                <th style="text-align:right">Valor Provedor</th>
+                <th style="text-align:right">Valor Cond./O.S.</th>
+                <th style="text-align:right">Total</th>
+                <th style="text-align:right">Bônus</th>
+                <th style="text-align:right">Total c/ Bônus</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-resumo">
+              <tr><td colspan="9"><div class="empty"><div class="empty-icon">📊</div>Sem dados ainda.</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ BÔNUS ═══════════════════════════════════ -->
+    <div class="tab" id="tab-bonus">
+      <div class="section-title">Bônus e Ajustes</div>
+      <div class="section-sub">Registre bônus (acréscimos) ou ajustes justificados (descontos). Ajustes devem ter respaldo em alinhamento prévio.</div>
+
+      <div class="card">
+        <div class="card-title">Novo registro</div>
+        <div class="bonus-form">
+          <div class="form-group">
+            <label>Técnico</label>
+            <select id="b-tec"><option value="">Selecione…</option></select>
+          </div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="b-tipo">
+              <option value="BONUS">BÔNUS (positivo)</option>
+              <option value="AJUSTE">AJUSTE (negativo)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Descrição / Justificativa</label>
+            <input type="text" id="b-desc" placeholder="Ex: Produtividade acima da meta em junho">
+          </div>
+          <div class="form-group">
+            <label>Valor (R$)</label>
+            <input type="number" id="b-valor" min="0" step="0.01" placeholder="0,00">
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button class="btn btn-primary" onclick="addBonus()">Adicionar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table id="tbl-bonus">
+            <thead>
+              <tr>
+                <th>Técnico</th>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th style="text-align:right">Valor</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-bonus">
+              <tr><td colspan="5"><div class="empty"><div class="empty-icon">⭐</div>Nenhum bônus ou ajuste registrado.</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:24px; padding-top:14px; border-top:1px solid var(--border);">
+          <div><span style="color:var(--muted); font-size:12px;">Total Bônus: </span><span id="total-bonus" style="font-family:'JetBrains Mono',monospace; color:var(--accent2);">R$ 0,00</span></div>
+          <div><span style="color:var(--muted); font-size:12px;">Total Ajustes: </span><span id="total-ajustes" style="font-family:'JetBrains Mono',monospace; color:var(--danger);">R$ 0,00</span></div>
+          <div><span style="color:var(--muted); font-size:12px;">Líquido: </span><span id="total-liquido" style="font-family:'JetBrains Mono',monospace; color:var(--text); font-weight:700;">R$ 0,00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ COMPROVANTES ═══════════════════════════════════ -->
+    <div class="tab" id="tab-comprovantes">
+      <div class="section-title">Comprovantes por Técnico</div>
+      <div class="section-sub">Documento individual com o detalhamento dos serviços realizados, valores pagos, bônus, descontos e campo para assinatura.</div>
+
+      <div class="card no-print">
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr auto auto; align-items:end;">
+          <div class="form-group">
+            <label>Técnico</label>
+            <select id="rec-tec">
+              <option value="__ALL__">Todos os técnicos ativos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Período (mês/ano)</label>
+            <input type="text" id="rec-periodo" placeholder="Ex: Junho / 2025">
+          </div>
+          <button class="btn btn-primary" onclick="renderComprovantes()">Atualizar</button>
+          <button class="btn" style="background:var(--accent); color:#fff;" onclick="window.print()">🖨 Imprimir / PDF</button>
+        </div>
+      </div>
+
+      <div id="print-area"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════ TABELA DE VALORES ═══════════════════════════════════ -->
+    <div class="tab" id="tab-tabela">
+      <div class="section-title">Tabela de Comissões</div>
+      <div class="section-sub">Valores de referência — leitura apenas. Para alterar, edite o código-fonte ou a planilha original.</div>
+
+      <div class="card">
+        <div class="card-title">Serviços com valor fixo</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Serviço</th><th style="text-align:right">Valor (R$)</th></tr></thead>
+            <tbody id="tbl-fixos"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Progressivos escalonados — NAP / Caixa de Emenda / Bandeja</div>
+        <div class="info-box">
+          O valor por unidade aumenta conforme a quantidade acumulada do <strong>mesmo tipo de serviço feito pelo técnico no mesmo dia</strong>. Faixa 1: 1–5 (R$ 5,00/un) · Faixa 2: 6–7 (R$ 6,00/un) · Faixa 3: 8+ (R$ 7,00/un).
+        </div>
+        <div class="table-wrap">
+          <table class="progress-table">
+            <thead>
+              <tr>
+                <th>Serviço</th>
+                <th>Faixa 1 (1–5 no dia)</th>
+                <th>Faixa 2 (6–7 no dia)</th>
+                <th>Faixa 3 (8+ no dia)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>NAP</td>
+                <td class="num">R$ 5,00/un</td>
+                <td class="num">R$ 6,00/un</td>
+                <td class="num">R$ 7,00/un</td>
+              </tr>
+              <tr>
+                <td>Caixa de Emenda</td>
+                <td class="num">R$ 5,00/un</td>
+                <td class="num">R$ 6,00/un</td>
+                <td class="num">R$ 7,00/un</td>
+              </tr>
+              <tr>
+                <td>Bandeja</td>
+                <td class="num">R$ 5,00/un</td>
+                <td class="num">R$ 6,00/un</td>
+                <td class="num">R$ 7,00/un</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ CONFIGURAÇÕES ═══════════════════════════════════ -->
+    <div class="tab" id="tab-config">
+      <div class="section-title">Configurações</div>
+      <div class="section-sub">Integração com Google Sheets — a URL fica salva neste navegador, não é mais preciso editar o arquivo.</div>
+
+      <div class="card">
+        <div class="card-title">Conexão com Google Sheets</div>
+        <div class="info-box">
+          Cole aqui a URL gerada no deploy do Apps Script. Enquanto não configurada, o sistema funciona só localmente neste navegador (sem sincronizar com a planilha nem entre outras máquinas).
+        </div>
+        <div class="form-grid" style="max-width:640px; display:grid; grid-template-columns:1fr; gap:14px; margin-bottom:16px;">
+          <div class="form-group">
+            <label>URL do Web App (Apps Script)</label>
+            <input type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/…/exec">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="saveConfig()">💾 Salvar</button>
+          <button class="btn" style="background:rgba(148,163,184,.15); color:var(--text);" onclick="testConnection()">🧪 Testar conexão</button>
+          <button class="btn" style="background:rgba(148,163,184,.15); color:var(--text);" onclick="forcePoll()">🔄 Sincronizar agora</button>
+        </div>
+        <div id="cfg-status" style="font-size:12px; color:var(--muted,#94a3b8); margin-top:10px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Apps Script — cole no script.google.com</div>
+        <div class="info-box" style="margin-bottom:10px;">
+          1. Acesse <strong>script.google.com</strong> → Novo projeto<br>
+          2. Apague o conteúdo padrão e cole o código abaixo<br>
+          3. Salve → <strong>Implantar → Nova implantação → App da Web</strong><br>
+          4. Executar como: <em>Eu</em> · Quem acessa: <em>Qualquer pessoa</em><br>
+          5. Copie a URL gerada e cole no campo acima<br>
+          6. Se editar o script depois, use <strong>Gerenciar implantações → Editar → Nova versão</strong> (a URL não muda)
+        </div>
+        <textarea readonly id="script-textarea" style="width:100%; height:280px; background:var(--surface,#0f172a); border:1px solid var(--border,#334155); border-radius:6px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:11px; padding:12px; resize:vertical; line-height:1.6;"></textarea>
+        <button class="btn btn-sm" style="background:rgba(148,163,184,.15); color:var(--text); margin-top:8px;" onclick="copyScript()">📋 Copiar script</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ CONFERÊNCIA ═══════════════════════════════════ -->
+    <div class="tab" id="tab-conferencia">
+      <div class="section-title">Conferência de O.S.</div>
+      <div class="section-sub">Selecione um técnico para conferir as O.S. lado a lado com o MK. Marque cada O.S. conforme conferir — o estado fica salvo.</div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div class="form-group" style="margin:0; min-width:200px;">
+            <label>Técnico</label>
+            <select id="conf-tec" onchange="renderConferencia()">
+              <option value="">— selecione —</option>
+            </select>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:18px;">
+            <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; user-select:none;">
+              <input type="checkbox" id="conf-filtro" onchange="renderConferencia()" style="width:15px;height:15px;">
+              Mostrar só não conferidas
+            </label>
+          </div>
+          <button class="btn" style="background:rgba(148,163,184,.15); color:var(--text); margin-top:18px;" onclick="limparConferencia()">✖ Limpar</button>
+        </div>
+      </div>
+
+      <div id="conf-progresso" style="display:none; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:6px;">
+          <span id="conf-prog-label">0 de 0 O.S. conferidas</span>
+          <span id="conf-prog-pct">0%</span>
+        </div>
+        <div style="background:var(--border); border-radius:20px; height:7px; overflow:hidden;">
+          <div id="conf-prog-bar" style="height:100%; border-radius:20px; background:var(--accent); transition:width .3s; width:0%;"></div>
+        </div>
+      </div>
+
+      <div id="conf-body"></div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════════════════
+// DADOS BASE
+// ════════════════════════════════════════════════════════════════════════
+
+const TECNICOS = ['Alan','Marlon','Jhonis','Wellington','Carlos','Esmaychel','Thiago','Germano'];
+
+const VALORES_FIXOS = {
+  'FIXO - SHOPPING':            { desc: 'Instalação Shopping',                valor: 40.00 },
+  'FIXO - DEDICADO':            { desc: 'Instalação Link Dedicado',            valor: 40.00 },
+  'FIXO - CONDOMINIO 1 TORRE':  { desc: 'Condomínio 1 Torre',                  valor: 200.00 },
+  'FIXO - CONDOMINIO 2 TORRES': { desc: 'Condomínio 2 Torres',                 valor: 300.00 },
+  'FIXO - CONDOMINIO 3 TORRES': { desc: 'Condomínio 3 Torres',                 valor: 380.00 },
+  'FIXO - RESIDENCIAL':         { desc: 'Instalação/Reinstalação Residencial', valor: 5.00 },
+  'FIXO - MESH':                { desc: 'Instalação/Retirada Mesh',            valor: 5.00 },
+  'FIXO - MUDANCA ENDERECO':    { desc: 'Mudança de Endereço',                 valor: 5.00 },
+  'FIXO - MUDANCA INTERNA':     { desc: 'Mudança Interna de Equipamentos',     valor: 5.00 },
+  'FIXO - CABO TV':             { desc: 'Cabo Para TV',                        valor: 2.00 },
+  'FIXO - SINAL ALTO':          { desc: 'Sinal Alto FTTH',                     valor: 2.00 },
+  'FIXO - VERIFICACAO EXTERNA': { desc: 'Verificação Externa',                 valor: 2.00 },
+  'FIXO - RETIRADA RAMAL':      { desc: 'Retirada de Ramal',                   valor: 0.50 },
+  'FIXO - CHAMADO':             { desc: 'Chamados em Geral',                   valor: 2.00 },
+  'FIXO - RESERVA OPTICA':      { desc: 'Adesão Reserva Óptica',               valor: 5.00 },
+};
+
+const PROGRESSIVOS = ['NAP','EMENDA','BANDEJA'];
+const PROG_FAIXAS = [[1,5,5.00],[6,7,6.00],[8,Infinity,7.00]];
+
+// Dados em memória
+let lancamentos = []; // { id, data, os, local, origem, tipo, servico, qtd, tecsPart, valorUnit, valorTotal, valorRateado, faixa }
+let bonusList   = []; // { id, tec, tipo, desc, valor }
+
+// ════════════════════════════════════════════════════════════════════════
+// INICIALIZAÇÃO
+// ════════════════════════════════════════════════════════════════════════
+
+async function init() {
+  // carrega config (URL do Sheets) salva neste navegador
+  _loadCfg();
+  const cfgUrlInput = document.getElementById('cfg-url');
+  if (cfgUrlInput) cfgUrlInput.value = cfg.url || '';
+  const scriptTa = document.getElementById('script-textarea');
+  if (scriptTa) scriptTa.value = APPS_SCRIPT_CODE;
+
+  // carrega lançamentos/bônus/técnicos salvos de sessões anteriores
+  await loadState();
+
+  // inicializa container dinâmico de técnicos (principal + ajudantes ilimitados)
+  initTecsContainer(['']);   // começa só com o campo de principal
+
+  // preenche select de bônus e comprovante
+  ['b-tec', 'rec-tec'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    TECNICOS.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t;
+      sel.appendChild(opt);
+    });
+  });
+
+  // preenche tabela de fixos
+  const tbody = document.getElementById('tbl-fixos');
+  Object.entries(VALORES_FIXOS).forEach(([k, v]) => {
+    tbody.innerHTML += `<tr><td>${v.desc}</td><td class="num">R$ ${fmt(v.valor)}</td></tr>`;
+  });
+
+  // data padrão = hoje
+  document.getElementById('f-data').valueAsDate = new Date();
+
+  updateBadgeMes();
+  renderLancamentos();
+  renderBonus();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// PERSISTÊNCIA — Google Sheets via Apps Script
+//
+// A URL do Web App NÃO fica mais fixa no código-fonte: ela é definida
+// na aba "Configurações" e salva no localStorage deste navegador.
+// Isso evita ter que editar o arquivo .html toda vez que a implantação
+// do Apps Script mudar, e permite que cada máquina aponte para a mesma
+// planilha sem mexer em código.
+// ════════════════════════════════════════════════════════════════════════
+
+let cfg = { url: '' };
+
+function _loadCfg() {
+  try {
+    const saved = localStorage.getItem('connect_comissoes_cfg');
+    if (saved) cfg = Object.assign(cfg, JSON.parse(saved));
+  } catch (e) { console.warn('[_loadCfg]', e); }
+}
+
+// Indicador visual de sincronização — usa o dot fixo no header
+// (#sync-dot / #sync-label) em vez de um balão temporário.
+function _showSync(msg, color) {
+  const badge = document.getElementById('sheets-status');
+  if (badge) {
+    badge.style.display = '';
+    badge.textContent = '☁ ' + msg;
+    badge.style.background = color + '22';
+    badge.style.border = '1px solid ' + color + '55';
+    badge.style.color = color;
+    clearTimeout(badge._t);
+    badge._t = setTimeout(() => { badge.style.display = 'none'; }, 3200);
+  }
+}
+
+function setSyncStatus(dotColor, label) {
+  const dot = document.getElementById('sync-dot');
+  if (dot) dot.className = 'dot-' + dotColor;
+  const lbl = document.getElementById('sync-label');
+  if (lbl) lbl.textContent = label;
+}
+
+// Verifica se a URL da API foi configurada corretamente
+function _apiConfigurada() {
+  return !!(cfg.url && cfg.url.startsWith('https://script.google.com/macros/s/'));
+}
+
+// Requisição à API com tratamento de erro padronizado
+async function _api(params, body = null) {
+  const url = new URL(cfg.url);
+  if (params) Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
+  const opts = body
+    ? { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) } // text/plain evita preflight CORS — Apps Script não responde OPTIONS
+    : { method: 'GET' };
+  const res  = await fetch(url.toString(), opts);
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'Erro desconhecido');
+  return data;
+}
+
+// Carrega lançamentos + bônus do Sheets na inicialização
+async function loadState() {
+  if (!_apiConfigurada()) {
+    console.warn('Sheets não configurado — operando sem persistência remota.');
+    setSyncStatus('gray', 'Sheets não configurado');
+    return; // retorna normalmente, sem lançar exceção
+  }
+  try {
+    setSyncStatus('amber', 'Conectando…');
+    _showSync('⟳ Carregando dados…', '#3b82f6');
+    const data = await _api({});
+    lancamentos = Array.isArray(data.lancamentos) ? data.lancamentos : [];
+    bonusList   = Array.isArray(data.bonusList)   ? data.bonusList   : [];
+    // Normaliza tipos — o Sheets serializa arrays como strings JSON ou texto separado por vírgula.
+    // Todos os campos que o código espera como array precisam ser desserializados aqui.
+    lancamentos.forEach(l => {
+      l.id  = Number(l.id);
+      l.qtd = Number(l.qtd) || 1;
+      // tecsPart: pode vir como string JSON '["João","Pedro"]' ou como string simples 'João,Pedro'
+      if (!Array.isArray(l.tecsPart)) {
+        try { l.tecsPart = JSON.parse(l.tecsPart); } catch(_) {}
+        if (!Array.isArray(l.tecsPart))
+          l.tecsPart = String(l.tecsPart || '').split(',').map(s => s.trim()).filter(Boolean);
+      }
+      // extras: array de objetos {servico, qtd} — pode vir como string JSON ou vazio
+      if (!Array.isArray(l.extras)) {
+        try { l.extras = JSON.parse(l.extras); } catch(_) {}
+        if (!Array.isArray(l.extras)) l.extras = [];
+      }
+      // conferida pode vir do Sheets como string 'true'/'false'
+      l.conferida = l.conferida === true || l.conferida === 'true';
+      // O Google Sheets pode converter a data (string "YYYY-MM-DD") em um
+      // objeto Date real, que ao serializar em JSON vira um ISO completo
+      // ("2026-07-06T03:00:00.000Z"). Isso quebra o <input type="date">
+      // (fica vazio) e a formatação em fmtData(). Normaliza sempre para
+      // os 10 primeiros caracteres (YYYY-MM-DD).
+      if (l.data) l.data = String(l.data).slice(0, 10);
+    });
+    bonusList.forEach(b => { b.id = Number(b.id); b.valor = Number(b.valor) || 0; });
+    // Re-renderiza imediatamente apos receber os dados do Sheets,
+    // evitando a condicao de corrida onde init() renderiza antes da resposta chegar.
+    if (typeof recomputeProgressivos === 'function') recomputeProgressivos();
+    if (typeof renderLancamentos     === 'function') renderLancamentos();
+    if (typeof renderBonus           === 'function') renderBonus();
+    _showSync('✔ Dados carregados', '#10b981');
+    const agora = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    setSyncStatus('green', 'Sincronizado · ' + agora);
+  } catch (e) {
+    console.error('[loadState]', e);
+    _showSync('✗ Falha ao carregar — verifique a URL da API', '#ef4444');
+    setSyncStatus('red', 'Erro ao sincronizar');
+    // não relança — deixa o init() continuar e a UI funcionar offline
+  }
+}
+
+// Salva o estado completo (lançamentos + bônus) no Sheets
+// Chamado após qualquer operação que altere os dados.
+async function saveState() {
+  if (!_apiConfigurada()) return;
+  try {
+    setSyncStatus('amber', 'Salvando…');
+    _showSync('⟳ Salvando…', '#3b82f6');
+    // Serializa arrays para JSON string antes de enviar ao Sheets,
+    // evitando que tecsPart e extras virem '[object Object]' na planilha.
+    const lancsParaSalvar = lancamentos.map(l => ({
+      ...l,
+      tecsPart:   Array.isArray(l.tecsPart) ? JSON.stringify(l.tecsPart) : (l.tecsPart || '[]'),
+      extras:     Array.isArray(l.extras)   ? JSON.stringify(l.extras)   : (l.extras   || '[]'),
+      conferida:  l.conferida === true ? 'true' : 'false',
+    }));
+    await Promise.all([
+      _api({}, { action: 'save_all', resource: 'lancamentos', data: lancsParaSalvar }),
+      _api({}, { action: 'save_all', resource: 'bonus',       data: bonusList        }),
+    ]);
+    _showSync('✔ Salvo', '#10b981');
+    const agora = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    setSyncStatus('green', 'Sincronizado · ' + agora);
+  } catch (e) {
+    console.error('[saveState]', e);
+    _showSync('✗ Falha ao salvar', '#ef4444');
+    setSyncStatus('red', 'Erro ao sincronizar');
+    toast('Erro ao salvar no Sheets — verifique a URL da API.', true);
+  }
+}
+
+// ── Aba Configurações ──────────────────────────────────────────────────
+
+const APPS_SCRIPT_CODE = `// ════════════════════════════════════════════════════════════════════════
+// Apps Script — Backend para Comissões Infra CONNECT
+// ════════════════════════════════════════════════════════════════════════
+//
+// COMO INSTALAR:
+// 1. Abra o Google Sheets onde quer guardar os dados.
+// 2. Menu: Extensões → Apps Script.
+// 3. Delete o conteúdo padrão e cole TODO este arquivo.
+// 4. Salve (Ctrl+S).
+// 5. Clique em "Implantar" → "Nova implantação".
+//    - Tipo: App da Web
+//    - Executar como: Eu (sua conta)
+//    - Quem pode acessar: Qualquer pessoa (anonymous)
+// 6. Clique em "Implantar" e copie a URL gerada.
+// 7. Cole a URL na aba Configurações deste sistema.
+//
+// ATENÇÃO: Sempre que editar o script, faça uma NOVA implantação
+//          (ou atualize a existente) — a URL permanece a mesma após atualização.
+// ════════════════════════════════════════════════════════════════════════
+
+const SHEET_NAME_LANC  = 'lancamentos';
+const SHEET_NAME_BONUS = 'bonus';
+
+function getOrCreateSheet(name) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(name);
+  if (!sh) sh = ss.insertSheet(name);
+  return sh;
+}
+
+function sheetToJson(sh) {
+  const data = sh.getDataRange().getValues();
+  if (data.length < 2) return [];
+  const headers = data[0].map(String);
+  return data.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => {
+      let v = row[i];
+      // O Sheets converte texto "YYYY-MM-DD" em Date automaticamente.
+      // Sem isso, o JSON.stringify serializa como ISO com hora/timezone
+      // (ex: "2026-07-06T03:00:00.000Z"), quebrando o campo Data no front-end.
+      if (v instanceof Date) {
+        v = Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+      }
+      obj[h] = v;
+    });
+    return obj;
+  });
+}
+
+function jsonToSheet(sh, rows) {
+  sh.clearContents();
+  if (!rows || rows.length === 0) return;
+  const keys = Object.keys(rows[0]);
+  sh.appendRow(keys);
+  rows.forEach(r => sh.appendRow(keys.map(k => r[k] !== undefined ? r[k] : '')));
+}
+
+function jsonResp(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  try {
+    const lancamentos = sheetToJson(getOrCreateSheet(SHEET_NAME_LANC));
+    const bonusList   = sheetToJson(getOrCreateSheet(SHEET_NAME_BONUS));
+    return jsonResp({ ok: true, lancamentos, bonusList });
+  } catch (err) {
+    return jsonResp({ ok: false, error: err.message });
+  }
+}
+
+function doPost(e) {
+  try {
+    const body = JSON.parse(e.postData.contents);
+    const { action, resource, data } = body;
+
+    if (action === 'save_all') {
+      if (resource === 'lancamentos') {
+        jsonToSheet(getOrCreateSheet(SHEET_NAME_LANC), data || []);
+      } else if (resource === 'bonus') {
+        jsonToSheet(getOrCreateSheet(SHEET_NAME_BONUS), data || []);
+      } else {
+        return jsonResp({ ok: false, error: 'Recurso desconhecido: ' + resource });
+      }
+      return jsonResp({ ok: true });
+    }
+
+    return jsonResp({ ok: false, error: 'Ação desconhecida: ' + action });
+  } catch (err) {
+    return jsonResp({ ok: false, error: err.message });
+  }
+}`;
+
+function saveConfig() {
+  cfg.url = document.getElementById('cfg-url').value.trim();
+  localStorage.setItem('connect_comissoes_cfg', JSON.stringify(cfg));
+
+  const status = document.getElementById('cfg-status');
+  if (_apiConfigurada()) {
+    status.textContent = '✅ Configuração salva.';
+    loadState().then(() => { renderLancamentos(); renderBonus(); });
+  } else if (cfg.url) {
+    status.textContent = '⚠️ URL não parece válida — deve começar com https://script.google.com/macros/s/';
+    setSyncStatus('gray', 'Sheets não configurado');
+  } else {
+    status.textContent = '⚠️ Preencha a URL do Web App.';
+    setSyncStatus('gray', 'Sheets não configurado');
+  }
+}
+
+async function testConnection() {
+  const status = document.getElementById('cfg-status');
+  if (!cfg.url) { toast('Configure a URL primeiro.', true); return; }
+  status.textContent = 'Testando…';
+  try {
+    const data = await _api({});
+    status.textContent = '✅ Conexão OK! ' +
+      (Array.isArray(data.lancamentos) ? data.lancamentos.length : 0) + ' lançamento(s) e ' +
+      (Array.isArray(data.bonusList) ? data.bonusList.length : 0) + ' bônus na planilha.';
+    toast('Conexão com Sheets OK!');
+  } catch (err) {
+    status.textContent = '❌ ' + err.message;
+    toast('Falha na conexão — verifique a URL.', true);
+  }
+}
+
+async function forcePoll() {
+  await loadState();
+  renderLancamentos();
+  renderBonus();
+  toast('Sincronizado com o Sheets!');
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ABA CONFERÊNCIA
+// ════════════════════════════════════════════════════════════════════════
+
+// Classifica o lançamento em 'cliente' ou 'infra' com base nos campos
+// origem e servico, usando os valores reais do sistema.
+function _confCategoria(l) {
+  const orig = String(l.origem || '').toLowerCase();
+  const tipo = String(l.tipo   || '').toLowerCase();
+  const serv = String(l.servico || '').toUpperCase();
+  if (['NAP','EMENDA','BANDEJA'].includes(serv)) return 'infra';
+  if (serv.includes('CONDOMINIO')) return 'infra';
+  if (tipo.includes('infraestrutura')) return 'infra';
+  if (orig.includes('condomínio') || orig.includes('condominio')) return 'infra';
+  return 'cliente'; // Provedor, Instalação/Manutenção residencial, etc.
+}
+
+// Popula o select de técnicos e renderiza a visão do técnico selecionado.
+function renderConferencia() {
+  // popular select na primeira vez
+  const sel = document.getElementById('conf-tec');
+  if (sel.options.length === 1) { // só o placeholder
+    TECNICOS.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t; o.textContent = t;
+      sel.appendChild(o);
+    });
+  }
+
+  const tec     = sel.value;
+  const filtro  = document.getElementById('conf-filtro').checked;
+  const body    = document.getElementById('conf-body');
+  const prog    = document.getElementById('conf-progresso');
+
+  if (!tec) {
+    body.innerHTML = '<div class="info-box">Selecione um técnico para iniciar a conferência.</div>';
+    prog.style.display = 'none';
+    return;
+  }
+
+  // filtra lançamentos do técnico (principal ou ajudante)
+  const doTec = lancamentos.filter(l =>
+    Array.isArray(l.tecsPart) && l.tecsPart.includes(tec)
+  );
+
+  if (!doTec.length) {
+    body.innerHTML = '<div class="info-box">Nenhum lançamento encontrado para este técnico no período atual.</div>';
+    prog.style.display = 'none';
+    return;
+  }
+
+  // progresso
+  const total     = doTec.length;
+  const conferidas = doTec.filter(l => l.conferida === true).length;
+  const pct       = total ? Math.round(conferidas / total * 100) : 0;
+  prog.style.display = '';
+  document.getElementById('conf-prog-label').textContent = `${conferidas} de ${total} O.S. conferidas`;
+  document.getElementById('conf-prog-pct').textContent   = pct + '%';
+  document.getElementById('conf-prog-bar').style.width   = pct + '%';
+
+  // separa por categoria
+  const clientes = doTec.filter(l => _confCategoria(l) === 'cliente');
+  const infra    = doTec.filter(l => _confCategoria(l) === 'infra');
+
+  body.innerHTML = _confSecao('👤 Clientes', clientes, tec, filtro)
+                 + _confSecao('🔧 Infraestrutura', infra, tec, filtro);
+}
+
+function _confSecao(titulo, lista, tec, filtro) {
+  const visiveis = filtro ? lista.filter(l => !l.conferida) : lista;
+  const total    = lista.length;
+  const conf     = lista.filter(l => l.conferida).length;
+
+  let linhas = '';
+  if (!visiveis.length) {
+    linhas = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:18px;">
+      ${filtro && total > 0 ? '✅ Todas conferidas nesta seção.' : 'Nenhuma O.S. nesta categoria.'}
+    </td></tr>`;
+  } else {
+    visiveis.forEach(l => {
+      const checked   = l.conferida ? 'checked' : '';
+      const opacidade = l.conferida ? 'opacity:.4;' : '';
+      const nPart     = Array.isArray(l.tecsPart) ? l.tecsPart.length : 1;
+      const badgeAjuda = nPart > 1
+        ? `<span style="background:var(--accent2);color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:4px;">👥 ${nPart}</span>`
+        : '';
+      const principal = Array.isArray(l.tecsPart) ? l.tecsPart[0] : tec;
+      const ehPrincipal = principal === tec;
+      const valorExibido = ehPrincipal
+        ? `R$ ${fmt(l.valorRateado || l.valorTotal || 0)}`
+        : `<span style="color:var(--muted);font-size:11px;">ajudante</span>`;
+
+      linhas += `<tr style="${opacidade} transition:opacity .2s;">
+        <td style="text-align:center;">
+          <input type="checkbox" ${checked}
+            onchange="toggleConferida(${l.id}, this.checked)"
+            style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent);">
+        </td>
+        <td style="font-family:monospace;font-size:12px;">${l.os || '—'}</td>
+        <td style="font-size:12px;">${l.data || '—'}</td>
+        <td>${l.servico || '—'}</td>
+        <td style="font-size:12px;">${Array.isArray(l.tecsPart) ? l.tecsPart.join(', ') : tec}${badgeAjuda}</td>
+        <td class="num">${valorExibido}</td>
+        <td style="text-align:center;">${l.conferida ? '<span style="color:#10b981;font-weight:700;">✔</span>' : ''}</td>
+        <td style="text-align:center;">
+          <button class="btn btn-sm" title="Editar lançamento"
+            style="padding:3px 8px; font-size:11px; background:rgba(148,163,184,.15); color:var(--text);"
+            onclick="editarDaConferencia(${l.id})">✎</button>
+        </td>
+      </tr>`;
+    });
+  }
+
+  return `
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
+        <div class="card-title" style="margin:0;">${titulo}</div>
+        <span style="font-size:12px; color:var(--muted);">${conf}/${total} conferidas</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="table">
+          <thead><tr>
+            <th style="width:36px;">✔</th>
+            <th>O.S.</th>
+            <th>Data</th>
+            <th>Serviço</th>
+            <th>Técnicos</th>
+            <th class="num">Valor</th>
+            <th style="width:36px;"></th>
+          </tr></thead>
+          <tbody>${linhas}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function toggleConferida(id, valor) {
+  const lanc = lancamentos.find(l => l.id === id);
+  if (!lanc) return;
+  lanc.conferida = valor;
+  saveState();
+  // atualiza progresso sem re-renderizar a tabela toda (evita perder scroll)
+  const tec    = document.getElementById('conf-tec').value;
+  const doTec  = lancamentos.filter(l => Array.isArray(l.tecsPart) && l.tecsPart.includes(tec));
+  const total  = doTec.length;
+  const conf   = doTec.filter(l => l.conferida).length;
+  const pct    = total ? Math.round(conf / total * 100) : 0;
+  document.getElementById('conf-prog-label').textContent = `${conf} de ${total} O.S. conferidas`;
+  document.getElementById('conf-prog-pct').textContent   = pct + '%';
+  document.getElementById('conf-prog-bar').style.width   = pct + '%';
+  // aplica opacidade na linha sem re-render
+  const tr = document.querySelector(`input[onchange="toggleConferida(${id}, this.checked)"]`)?.closest('tr');
+  if (tr) tr.style.opacity = valor ? '0.4' : '1';
+  // mostra ✔ na última célula
+  const ultima = tr?.querySelector('td:last-child');
+  if (ultima) ultima.innerHTML = valor ? '<span style="color:#10b981;font-weight:700;">✔</span>' : '';
+}
+
+function editarDaConferencia(id) {
+  showTab('lancamentos');
+  startEditLancamento(id);
+}
+
+function limparConferencia() {
+  document.getElementById('conf-tec').value    = '';
+  document.getElementById('conf-filtro').checked = false;
+  renderConferencia();
+}
+
+function copyScript() {
+  navigator.clipboard.writeText(document.getElementById('script-textarea').value)
+    .then(() => toast('Script copiado!'));
+}
+
+function updateBadgeMes() {
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const d = new Date();
+  document.getElementById('badge-mes').textContent = `${meses[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ════════════════════════════════════════════════════════════════════════
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('nav button')[['lancamentos','importar','resumo','bonus','comprovantes','tabela','config','conferencia'].indexOf(name)].classList.add('active');
+  if (name === 'resumo') renderResumo();
+  if (name === 'comprovantes') renderComprovantes();
+  if (name === 'conferencia') renderConferencia();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// LÓGICA DE VALORES
+// ════════════════════════════════════════════════════════════════════════
+
+function getProgFaixa(acumulo) {
+  if (acumulo <= 5) return { label: 'Faixa 1 (1–5)', valor: 5.00 };
+  if (acumulo <= 7) return { label: 'Faixa 2 (6–7)', valor: 6.00 };
+  return { label: 'Faixa 3 (8+)', valor: 7.00 };
+}
+
+// Acúmulo do técnico principal no dia para um tipo progressivo
+function acumuloDia(tecPrincipal, data, servico, excludeId = null) {
+  return lancamentos
+    .filter(l => l.id !== excludeId && l.data === data && l.tecsPart[0] === tecPrincipal && l.servico === servico)
+    .reduce((s, l) => s + (l.qtd || 1), 0);
+}
+
+function calcValor(servico, qtd, tecPrincipal, data, excludeId = null) {
+  if (VALORES_FIXOS[servico]) {
+    const val = VALORES_FIXOS[servico].valor;
+    return { valorUnit: val, valorTotal: val, faixa: '—' };
+  }
+  if (PROGRESSIVOS.includes(servico)) {
+    const acum = acumuloDia(tecPrincipal, data, servico, excludeId);
+    const faixaInfo = getProgFaixa(acum + qtd);
+    const valorUnit = faixaInfo.valor;
+    const valorTotal = valorUnit * qtd;
+    return { valorUnit, valorTotal, faixa: faixaInfo.label };
+  }
+  return { valorUnit: 0, valorTotal: 0, faixa: '—' };
+}
+
+function onServicoChange() {
+  const s = document.getElementById('f-servico').value;
+  const grp = document.getElementById('grp-qtd');
+  grp.style.display = PROGRESSIVOS.includes(s) ? '' : 'none';
+  updatePreview();
+}
+
+function updatePreview() {
+  const servico = document.getElementById('f-servico').value;
+  const tecPrincipal = document.getElementById('f-tec0').value;
+  const data = document.getElementById('f-data').value;
+  const qtd = parseInt(document.getElementById('f-qtd').value) || 1;
+  if (!servico || !tecPrincipal) { document.getElementById('preview-valor').textContent = ''; return; }
+  const { valorTotal } = calcValor(servico, qtd, tecPrincipal, data);
+  document.getElementById('preview-valor').textContent = `≈ R$ ${fmt(valorTotal)}`;
+}
+
+document.addEventListener('change', e => {
+  if (['f-servico','f-tec0','f-data','f-qtd'].includes(e.target.id)) updatePreview();
+});
+
+// ════════════════════════════════════════════════════════════════════════
+// LANÇAMENTOS — ADICIONAR / EDITAR / REMOVER
+// ════════════════════════════════════════════════════════════════════════
+
+let editingId = null;
+
+// Recalcula os valores dos lançamentos progressivos (NAP/EMENDA/BANDEJA)
+// respeitando a ordem cronológica e o acúmulo diário por técnico principal.
+function recomputeProgressivos() {
+  // 1) Soma total do dia por (tec principal | data | serviço progressivo)
+  const totalMap = {};
+  lancamentos.forEach(l => {
+    if (PROGRESSIVOS.includes(l.servico)) {
+      const key = `${l.tecsPart[0]}|${l.data}|${l.servico}`;
+      totalMap[key] = (totalMap[key] || 0) + (l.qtd || 1);
+    }
+  });
+  // 2) Aplica o preço da faixa correspondente ao TOTAL do dia a TODAS as unidades.
+  //    Regra: ao entrar em uma nova faixa, todas as unidades passam a valer o novo preço.
+  lancamentos.forEach(l => {
+    if (PROGRESSIVOS.includes(l.servico)) {
+      const key = `${l.tecsPart[0]}|${l.data}|${l.servico}`;
+      const total = totalMap[key] || (l.qtd || 1);
+      const faixaInfo = getProgFaixa(total);
+      l.valorUnit = faixaInfo.valor;
+      l.valorTotal = l.valorUnit * (l.qtd || 1);
+      l.valorRateado = l.valorTotal / (l.divisorRateio || l.tecsPart.length || 1);
+      l.faixa = faixaInfo.label;
+    } else {
+      l.valorRateado = l.valorTotal / (l.divisorRateio || l.tecsPart.length || 1);
+    }
+  });
+}
+
+function lerFormLancamento() {
+  const data     = document.getElementById('f-data').value;
+  const os       = document.getElementById('f-os').value.trim();
+  const local    = document.getElementById('f-local').value.trim();
+  const origem   = document.getElementById('f-origem').value;
+  const tipo     = document.getElementById('f-tipo').value;
+  const servico  = document.getElementById('f-servico').value;
+  const qtd      = parseInt(document.getElementById('f-qtd').value) || 1;
+  const nPartic  = parseInt(document.getElementById('f-npartic').value) || 1;
+  const tecsPart = Array.from(document.querySelectorAll('.f-tec-select')).map(s => s.value).filter(Boolean);
+
+  // Lê serviços extras
+  const extras = [];
+  document.querySelectorAll('.extra-servico-row').forEach(row => {
+    const s = row.querySelector('.extra-srv').value;
+    const q = parseInt(row.querySelector('.extra-qtd').value) || 1;
+    if (s) extras.push({ servico: s, qtd: q });
+  });
+
+  return { data, os, local, origem, tipo, servico, qtd, nPartic, tecsPart, extras };
+}
+
+// ── Container dinâmico de técnicos ──────────────────────────────────────
+
+// Cria um select de técnico com label, classe f-tec-select e botão × para remover
+// (o principal não pode ser removido).
+function _criarSelectTec(valor, isPrincipal) {
+  const wrap = document.createElement('div');
+  wrap.className = 'form-group';
+  wrap.style.cssText = 'min-width:150px; position:relative;';
+
+  const label = document.createElement('label');
+  label.textContent = isPrincipal ? 'Téc. Principal ★' : 'Ajudante';
+  wrap.appendChild(label);
+
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex; gap:4px; align-items:center;';
+
+  const sel = document.createElement('select');
+  sel.className = 'f-tec-select';
+  sel.innerHTML = '<option value="">—</option>';
+  TECNICOS.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    if (t === valor) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  // preview ao trocar principal
+  if (isPrincipal) sel.addEventListener('change', updatePreview);
+  row.appendChild(sel);
+
+  if (!isPrincipal) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '×';
+    btn.title = 'Remover ajudante';
+    btn.style.cssText = 'background:rgba(239,68,68,.2); color:#ef4444; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:16px; flex-shrink:0;';
+    btn.onclick = () => { wrap.remove(); };
+    row.appendChild(btn);
+  }
+
+  wrap.appendChild(row);
+  return wrap;
+}
+
+// Inicializa (ou reinicializa) o container com um array de valores.
+// valores[0] = principal, valores[1..] = ajudantes.
+function initTecsContainer(valores) {
+  const container = document.getElementById('tecs-container');
+  container.innerHTML = '';
+  const vals = (valores && valores.length) ? valores : [''];
+  vals.forEach((v, i) => container.appendChild(_criarSelectTec(v, i === 0)));
+}
+
+// Adiciona um campo de ajudante ao container.
+function addAjudanteField() {
+  const container = document.getElementById('tecs-container');
+  container.appendChild(_criarSelectTec('', false));
+}
+
+// ── Gestão de serviços extras na mesma O.S. ──
+let _extraCount = 0;
+function addServicoExtra() {
+  _extraCount++;
+  const id = _extraCount;
+  const div = document.createElement('div');
+  div.className = 'extra-servico-row';
+  div.dataset.extraId = id;
+  div.style.cssText = 'display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:end;margin-bottom:10px;padding:10px 14px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15);border-radius:8px;';
+
+  const servicoOpts = [
+    ...Object.entries(VALORES_FIXOS).map(([k,v]) => `<option value="${k}">${v.desc}</option>`),
+    `<optgroup label="── Progressivos ──">`,
+    ...PROGRESSIVOS.map(p => `<option value="${p}">${p} (progressivo)</option>`),
+    `</optgroup>`,
+  ].join('');
+
+  div.innerHTML = `
+    <div class="form-group">
+      <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Serviço extra #${id}</label>
+      <select class="extra-srv" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:8px 10px;width:100%;" onchange="onExtraServicoChange(this)">
+        <option value="">Selecione…</option>${servicoOpts}
+      </select>
+    </div>
+    <div class="form-group extra-qtd-grp" style="display:none;">
+      <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Qtd</label>
+      <input class="extra-qtd" type="number" min="1" value="1" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:8px 10px;width:80px;">
+    </div>
+    <div class="form-group">
+      <label style="font-size:11px;">&nbsp;</label>
+      <button class="btn btn-danger btn-sm" onclick="this.closest('.extra-servico-row').remove()" title="Remover">✕</button>
+    </div>`;
+
+  document.getElementById('extras-container').appendChild(div);
+}
+
+function onExtraServicoChange(sel) {
+  const row = sel.closest('.extra-servico-row');
+  const qtdGrp = row.querySelector('.extra-qtd-grp');
+  qtdGrp.style.display = PROGRESSIVOS.includes(sel.value) ? '' : 'none';
+}
+
+// Verifica se a O.S. já existe em outro lançamento (ignora o próprio grupo,
+// quando estiver editando, e ignora comparação se o campo estiver vazio).
+function osJaLancada(os, excludeId) {
+  const osNorm = String(os || '').trim().toLowerCase();
+  if (!osNorm) return false;
+  return lancamentos.some(l => {
+    if (excludeId !== null && (l.id === excludeId || l._grupoEdit === excludeId || l._extraDe === excludeId)) return false;
+    return String(l.os || '').trim().toLowerCase() === osNorm;
+  });
+}
+
+function addLancamento() {
+  const f = lerFormLancamento();
+  if (!f.data || !f.servico || f.tecsPart.length === 0) {
+    toast('Preencha ao menos: Data, Serviço e Técnico Principal.', true); return;
+  }
+  if (new Set(f.tecsPart).size !== f.tecsPart.length) {
+    toast('Há técnicos repetidos na mesma linha.', true); return;
+  }
+  if (f.os && osJaLancada(f.os, editingId)) {
+    const continuar = confirm(`Já existe um lançamento com a O.S. "${f.os}" no sistema.\n\nSe continuar, essa O.S. será lançada de novo (pode gerar comissão em dobro). Deseja continuar mesmo assim?`);
+    if (!continuar) return;
+  }
+
+  // Determina o divisor do rateio:
+  // usa nPartic se for maior que o nº de nomes selecionados
+  const nomesSelecionados = f.tecsPart.length;
+  const divisorRateio = Math.max(nomesSelecionados, f.nPartic || 1);
+
+  if (editingId !== null) {
+    const idx = lancamentos.findIndex(l => l.id === editingId);
+    if (idx === -1) { cancelEdit(); return; }
+    const cur = lancamentos[idx];
+
+    // Ao editar, remove extras antigos vinculados ao mesmo grupo de edição
+    lancamentos = lancamentos.filter(l => l._grupoEdit !== editingId);
+
+    Object.assign(cur, f);
+    const { valorUnit, valorTotal, faixa } = calcValor(f.servico, f.qtd, f.tecsPart[0], f.data, cur.id);
+    cur.valorUnit    = valorUnit;
+    cur.valorTotal   = valorTotal;
+    cur.nPartic      = f.nPartic;
+    cur.divisorRateio = divisorRateio;
+    cur.valorRateado = valorTotal / divisorRateio;
+    cur.faixa        = faixa;
+    cur.extras       = f.extras;
+
+    // Reinsere extras editados
+    f.extras.forEach((ex, i) => {
+      const { valorUnit: vu, valorTotal: vt, faixa: fx } = calcValor(ex.servico, ex.qtd, f.tecsPart[0], f.data);
+      lancamentos.push({
+        id: Date.now() + i + 1,
+        _grupoEdit: editingId,
+        _osRef: f.os,
+        data: f.data, os: f.os, local: f.local, origem: f.origem, tipo: f.tipo,
+        servico: ex.servico, qtd: ex.qtd,
+        tecsPart: f.tecsPart,
+        nPartic: f.nPartic, divisorRateio,
+        valorUnit: vu, valorTotal: vt, valorRateado: vt / divisorRateio, faixa: fx,
+        _extraDe: editingId,
+      });
+    });
+
+    recomputeProgressivos();
+    renderLancamentos();
+    saveState();
+    cancelEdit();
+    toast('Lançamento atualizado!');
+    return;
+  }
+
+  const tecPrincipal = f.tecsPart[0];
+  const { valorUnit, valorTotal, faixa } = calcValor(f.servico, f.qtd, tecPrincipal, f.data);
+  const valorRateado = valorTotal / divisorRateio;
+
+  const idPrincipal = Date.now();
+  lancamentos.push({
+    id: idPrincipal,
+    ...f,
+    nPartic: f.nPartic,
+    divisorRateio,
+    valorUnit, valorTotal, valorRateado, faixa,
+  });
+
+  // Lança serviços extras da mesma O.S. vinculados ao principal
+  f.extras.forEach((ex, i) => {
+    const { valorUnit: vu, valorTotal: vt, faixa: fx } = calcValor(ex.servico, ex.qtd, tecPrincipal, f.data);
+    lancamentos.push({
+      id: idPrincipal + i + 1,
+      _extraDe: idPrincipal,
+      _osRef: f.os,
+      data: f.data, os: f.os, local: f.local, origem: f.origem, tipo: f.tipo,
+      servico: ex.servico, qtd: ex.qtd,
+      tecsPart: f.tecsPart,
+      nPartic: f.nPartic, divisorRateio,
+      valorUnit: vu, valorTotal: vt, valorRateado: vt / divisorRateio, faixa: fx,
+    });
+  });
+
+  recomputeProgressivos();
+  renderLancamentos();
+  saveState();
+
+  // Limpa extras e reseta contador
+  document.getElementById('extras-container').innerHTML = '';
+  _extraCount = 0;
+
+  toast(f.extras.length
+    ? `Lançamento adicionado com ${f.extras.length} serviço(s) extra(s) na mesma O.S.!`
+    : 'Lançamento adicionado!');
+}
+
+function startEditLancamento(id) {
+  const l = lancamentos.find(x => x.id === id);
+  if (!l) return;
+  editingId = id;
+  document.getElementById('f-data').value      = String(l.data || '').slice(0, 10);
+  document.getElementById('f-os').value        = l.os || '';
+  document.getElementById('f-local').value     = l.local || '';
+  document.getElementById('f-origem').value    = l.origem || '';
+  document.getElementById('f-tipo').value      = l.tipo || '';
+  document.getElementById('f-servico').value   = l.servico || '';
+  document.getElementById('f-qtd').value       = l.qtd || 1;
+  document.getElementById('f-npartic').value   = l.nPartic || l.tecsPart.length || 1;
+  initTecsContainer(l.tecsPart && l.tecsPart.length ? l.tecsPart : ['']);
+
+  // Restaura extras vinculados
+  document.getElementById('extras-container').innerHTML = '';
+  _extraCount = 0;
+  const extras = lancamentos.filter(x => x._extraDe === id);
+  extras.forEach(ex => {
+    addServicoExtra();
+    const rows = document.querySelectorAll('.extra-servico-row');
+    const row = rows[rows.length - 1];
+    row.querySelector('.extra-srv').value = ex.servico || '';
+    onExtraServicoChange(row.querySelector('.extra-srv'));
+    row.querySelector('.extra-qtd').value = ex.qtd || 1;
+  });
+
+  onServicoChange();
+  updatePreview();
+
+  document.getElementById('btn-add').textContent = '💾 Salvar alterações';
+  document.getElementById('btn-cancel-edit').style.display = '';
+  document.getElementById('editing-indicator').style.display = '';
+  renderLancamentos();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelEdit() {
+  editingId = null;
+  document.getElementById('btn-add').textContent = '＋ Adicionar lançamento';
+  document.getElementById('btn-cancel-edit').style.display = 'none';
+  document.getElementById('editing-indicator').style.display = 'none';
+  document.getElementById('extras-container').innerHTML = '';
+  _extraCount = 0;
+  initTecsContainer(['']); // reseta para só o campo principal
+  renderLancamentos();
+}
+
+function removeLancamento(id) {
+  if (editingId === id) cancelEdit();
+  // Remove o principal e todos os extras vinculados a ele
+  lancamentos = lancamentos.filter(l => l.id !== id && l._extraDe !== id);
+  recomputeProgressivos();
+  renderLancamentos();
+  saveState();
+}
+
+function clearAll() {
+  if (!confirm('Apagar todos os lançamentos?')) return;
+  lancamentos = [];
+  editingId = null;
+  cancelEdit();
+  renderLancamentos();
+  saveState();
+}
+
+function renderLancamentos() {
+  const tbody = document.getElementById('tbody-lancamentos');
+  if (!lancamentos.length) {
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty"><div class="empty-icon">📋</div>Nenhum lançamento ainda. Preencha o formulário acima.</div></td></tr>`;
+    return;
+  }
+
+  // Ordena: data desc; dentro da mesma data, mantém progressivos do mesmo (tec+serviço) juntos, em ordem cronológica de criação
+  const ordenados = [...lancamentos].sort((a, b) => {
+    if (a.data !== b.data) return b.data.localeCompare(a.data);
+    const aProg = PROGRESSIVOS.includes(a.servico);
+    const bProg = PROGRESSIVOS.includes(b.servico);
+    if (aProg && bProg) {
+      const kA = a.servico + '|' + a.tecsPart[0];
+      const kB = b.servico + '|' + b.tecsPart[0];
+      if (kA !== kB) return kA.localeCompare(kB);
+      return a.id - b.id;
+    }
+    if (aProg !== bProg) return aProg ? -1 : 1;
+    return a.id - b.id;
+  });
+
+  // Estatísticas de grupo (data|tec|serviço) apenas para progressivos
+  const groupInfo = {};
+  ordenados.forEach(l => {
+    if (!PROGRESSIVOS.includes(l.servico)) return;
+    const k = `${l.data}|${l.tecsPart[0]}|${l.servico}`;
+    if (!groupInfo[k]) groupInfo[k] = { count: 0, totalQtd: 0, totalVal: 0, faixaFinal: '' };
+    groupInfo[k].count++;
+    groupInfo[k].totalQtd += (l.qtd || 1);
+    groupInfo[k].totalVal += l.valorTotal;
+    groupInfo[k].faixaFinal = l.faixa; // último recalcula na maior faixa alcançada
+  });
+
+  // Índice de quais lançamentos são extras de outro
+  const extraDeSet = new Set(ordenados.filter(l => l._extraDe).map(l => l._extraDe));
+  // Agrupar extras por O.S. principal para exibição mesclada
+  const osExtraInfo = {};
+  ordenados.forEach(l => {
+    if (!l._extraDe) return;
+    const k = l._extraDe;
+    if (!osExtraInfo[k]) osExtraInfo[k] = { items: [], totalVal: 0 };
+    osExtraInfo[k].items.push(l);
+    osExtraInfo[k].totalVal += l.valorTotal;
+  });
+
+  const seen = {};
+  const shownExtras = new Set();
+  let html = '';
+
+  ordenados.forEach(l => {
+    // Extras secundários são renderizados embutidos no bloco do principal — pula aqui
+    if (l._extraDe) return;
+
+    const descServico = VALORES_FIXOS[l.servico]?.desc || l.servico;
+    const isEditing = l.id === editingId;
+    const isProg = PROGRESSIVOS.includes(l.servico);
+    const gKey = isProg ? `${l.data}|${l.tecsPart[0]}|${l.servico}` : null;
+    const g = gKey ? groupInfo[gKey] : null;
+    const isGroup = g && g.count > 1;
+    const temExtras = !!osExtraInfo[l.id];
+    const extras = osExtraInfo[l.id]?.items || [];
+    const totalOsVal = l.valorTotal + (osExtraInfo[l.id]?.totalVal || 0);
+    const divisor = l.divisorRateio || l.tecsPart.length || 1;
+    const nParticLabel = l.nPartic > l.tecsPart.length
+      ? `<span title="Qtd. participantes informada">${l.nPartic} part.</span>`
+      : `${l.tecsPart.length}`;
+
+    if (isGroup) {
+      seen[gKey] = (seen[gKey] || 0) + 1;
+      if (seen[gKey] === 1) {
+        html += `<tr style="background:rgba(59,130,246,.10); border-top:2px solid var(--accent);">
+          <td colspan="12" style="padding:8px 10px; font-size:12px;">
+            <span style="color:var(--accent); font-weight:700;">🔗 Grupo escalável</span>
+            &nbsp;·&nbsp; <strong>${l.servico}</strong>
+            &nbsp;·&nbsp; ${fmtDate(l.data)}
+            &nbsp;·&nbsp; Técnico: <strong style="color:var(--text);">${l.tecsPart[0]}</strong>
+            &nbsp;·&nbsp; ${g.count} lançamentos
+            &nbsp;·&nbsp; qtd acumulada no dia: <strong style="color:var(--text);">${g.totalQtd}</strong>
+            &nbsp;·&nbsp; faixa final: <span class="pill pill-blue">${g.faixaFinal}</span>
+            &nbsp;·&nbsp; total do grupo: <strong style="color:var(--text);">R$ ${fmt(g.totalVal)}</strong>
+          </td>
+        </tr>`;
+      }
+    }
+
+    // Cabeçalho de agrupamento por O.S. quando há serviços extras
+    if (temExtras) {
+      html += `<tr style="background:rgba(16,185,129,.08); border-top:2px solid var(--accent2);">
+        <td colspan="12" style="padding:7px 10px; font-size:12px;">
+          <span style="color:var(--accent2); font-weight:700;">📋 O.S. com múltiplos serviços</span>
+          &nbsp;·&nbsp; O.S.: <strong style="font-family:'JetBrains Mono',monospace;">${l.os || '—'}</strong>
+          &nbsp;·&nbsp; ${1 + extras.length} serviços
+          &nbsp;·&nbsp; Total da O.S.: <strong style="color:var(--text);">R$ ${fmt(totalOsVal)}</strong>
+          &nbsp;·&nbsp; Rateado (${divisor} part.): <strong style="color:var(--accent2);">R$ ${fmt(totalOsVal / divisor)}</strong>
+        </td>
+      </tr>`;
+    }
+
+    const rowStyle = (isEditing ? 'background:rgba(245,158,11,.08);' : '')
+      + (isGroup ? 'box-shadow: inset 3px 0 0 var(--accent);' : '')
+      + (temExtras ? 'box-shadow: inset 3px 0 0 var(--accent2);' : '');
+    const groupPos = isGroup
+      ? `<div style="color:var(--accent); font-size:10px; font-weight:600;">↳ item ${seen[gKey]}/${g.count} do dia</div>`
+      : '';
+    const extraTag = temExtras
+      ? `<div style="color:var(--accent2); font-size:10px; font-weight:600; margin-top:2px;">↳ serviço 1/${1 + extras.length} da O.S.</div>`
+      : '';
+
+    html += `<tr style="${rowStyle}">
+      <td>${fmtDate(l.data)}${groupPos}${extraTag}</td>
+      <td style="font-family:'JetBrains Mono',monospace; font-size:11px;">${l.os || '—'}</td>
+      <td style="max-width:140px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${l.local || '—'}</td>
+      <td>${descServico}${l.qtd > 1 ? ` <span style="color:var(--muted)">×${l.qtd}</span>` : ''}</td>
+      <td><span class="pill pill-blue">${l.faixa}</span></td>
+      <td><strong style="color:var(--text);">${l.tecsPart[0]}</strong></td>
+      <td style="color:var(--muted); font-size:12px;">${l.tecsPart.slice(1).join(', ') || '—'}</td>
+      <td class="num" style="font-size:12px; color:var(--subtle);">${nParticLabel}</td>
+      <td class="num">R$ ${fmt(l.valorUnit)}</td>
+      <td class="num accent">R$ ${fmt(l.valorTotal)}</td>
+      <td class="num pos">R$ ${fmt(l.valorRateado)}<span style="color:var(--muted); font-size:10px;"> /p</span></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-sm" style="background:var(--accent); color:#fff; margin-right:4px;" onclick="startEditLancamento(${l.id})" ${isEditing ? 'disabled' : ''}>✎</button>
+        <button class="btn btn-danger btn-sm" onclick="removeLancamento(${l.id})">✕</button>
+      </td>
+    </tr>`;
+
+    // Renderiza extras embutidos abaixo do principal
+    extras.forEach((ex, idx) => {
+      const descEx = VALORES_FIXOS[ex.servico]?.desc || ex.servico;
+      html += `<tr style="background:rgba(16,185,129,.04); box-shadow: inset 3px 0 0 var(--accent2);">
+        <td style="padding-left:24px; font-size:11px; color:var(--muted);">↳ extra ${idx + 2}/${1 + extras.length}</td>
+        <td style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted);">${ex.os || '—'}</td>
+        <td></td>
+        <td style="font-size:12px;">${descEx}${ex.qtd > 1 ? ` <span style="color:var(--muted)">×${ex.qtd}</span>` : ''}</td>
+        <td><span class="pill pill-blue">${ex.faixa}</span></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="num">R$ ${fmt(ex.valorUnit)}</td>
+        <td class="num accent">R$ ${fmt(ex.valorTotal)}</td>
+        <td class="num pos" style="color:var(--muted); font-size:11px;">(incluído no rateio)</td>
+        <td></td>
+      </tr>`;
+    });
+  });
+
+  tbody.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// RESUMO
+// ════════════════════════════════════════════════════════════════════════
+
+function renderResumo() {
+  const resumo = {};
+  TECNICOS.forEach(t => {
+    resumo[t] = { servProvedor: 0, servCond: 0, valProvedor: 0, valCond: 0 };
+  });
+
+  lancamentos.forEach(l => {
+    l.tecsPart.forEach(tec => {
+      if (!resumo[tec]) resumo[tec] = { servProvedor: 0, servCond: 0, valProvedor: 0, valCond: 0 };
+      const isProvedor = l.origem === 'Provedor';
+      if (isProvedor) { resumo[tec].servProvedor++; resumo[tec].valProvedor += l.valorRateado; }
+      else            { resumo[tec].servCond++;     resumo[tec].valCond     += l.valorRateado; }
+    });
+  });
+
+  const bonusPorTec = {};
+  bonusList.forEach(b => {
+    if (!bonusPorTec[b.tec]) bonusPorTec[b.tec] = 0;
+    bonusPorTec[b.tec] += b.tipo === 'BONUS' ? b.valor : -b.valor;
+  });
+
+  const tbody = document.getElementById('tbody-resumo');
+  let totalOS = 0, totalVal = 0, totalBon = 0, ativos = 0;
+  let rows = '';
+
+  TECNICOS.forEach(t => {
+    const r = resumo[t];
+    const totalServ = r.servProvedor + r.servCond;
+    const totalGeral = r.valProvedor + r.valCond;
+    const bonus = bonusPorTec[t] || 0;
+    const comBonus = totalGeral + bonus;
+    if (totalServ === 0 && !bonus) return;
+    ativos++;
+    totalOS += totalServ; totalVal += totalGeral; totalBon += comBonus;
+    rows += `<tr>
+      <td><strong style="color:var(--text);">${t}</strong></td>
+      <td class="num">${r.servProvedor}</td>
+      <td class="num">${r.servCond}</td>
+      <td class="num accent">${totalServ}</td>
+      <td class="num">R$ ${fmt(r.valProvedor)}</td>
+      <td class="num">R$ ${fmt(r.valCond)}</td>
+      <td class="num accent">R$ ${fmt(totalGeral)}</td>
+      <td class="num ${bonus >= 0 ? 'pos' : 'neg'}">R$ ${fmt(bonus)}</td>
+      <td class="num" style="color:var(--text); font-weight:700;">R$ ${fmt(comBonus)}</td>
+    </tr>`;
+  });
+
+  if (!rows) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📊</div>Sem dados ainda.</div></td></tr>`;
+  } else {
+    tbody.innerHTML = rows + `<tr class="total-row">
+      <td>TOTAL GERAL</td>
+      <td class="num"></td><td class="num"></td>
+      <td class="num">${totalOS}</td>
+      <td class="num"></td><td class="num"></td>
+      <td class="num">R$ ${fmt(totalVal)}</td>
+      <td class="num"></td>
+      <td class="num">R$ ${fmt(totalBon)}</td>
+    </tr>`;
+  }
+
+  document.getElementById('kpi-os').textContent = lancamentos.length;
+  document.getElementById('kpi-total').textContent = 'R$ ' + fmt(totalVal);
+  document.getElementById('kpi-bonus').textContent = 'R$ ' + fmt(totalBon);
+  document.getElementById('kpi-ativos').textContent = ativos;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// COMPROVANTES POR TÉCNICO
+// ════════════════════════════════════════════════════════════════════════
+
+function fmtData(iso) {
+  if (!iso) return '';
+  const [a, m, d] = String(iso).slice(0, 10).split('-');
+  return `${d}/${m}/${a}`;
+}
+
+function buildReciboHTML(tec, periodo) {
+  const lancs = lancamentos
+    .filter(l => l.tecsPart.includes(tec))
+    .slice()
+    .sort((a, b) => (a.data || '').localeCompare(b.data || ''));
+
+  const bonusTec = bonusList.filter(b => b.tec === tec);
+
+  let totalServ = 0;
+  let linhasServ = '';
+  lancs.forEach(l => {
+    const qtdTec = l.tecsPart.length;
+    const valor = l.valorRateado;
+    totalServ += valor;
+    linhasServ += `<tr>
+      <td>${fmtData(l.data)}</td>
+      <td>${l.os || '-'}</td>
+      <td>${l.servico || l.tipo || '-'}</td>
+      <td>${l.local || '-'}</td>
+      <td class="num">${l.qtd || 1}</td>
+      <td class="num">R$ ${fmt(l.valorTotal)}</td>
+      <td class="num">${qtdTec}${qtdTec > 1 ? ' (rateado)' : ''}</td>
+      <td class="num">R$ ${fmt(valor)}</td>
+    </tr>`;
+  });
+
+  if (!linhasServ) {
+    linhasServ = `<tr><td colspan="8" style="text-align:center; padding:14px; color:#666;">Nenhum lançamento no período.</td></tr>`;
+  }
+
+  let totalBonus = 0, totalAjuste = 0;
+  let linhasBonus = '';
+  bonusTec.forEach(b => {
+    if (b.tipo === 'BONUS') totalBonus += b.valor;
+    else totalAjuste += b.valor;
+    linhasBonus += `<tr>
+      <td>${b.tipo === 'BONUS' ? 'Bônus' : 'Desconto / Ajuste'}</td>
+      <td>${b.desc}</td>
+      <td class="num ${b.tipo === 'BONUS' ? 'pos' : 'neg'}">${b.tipo === 'BONUS' ? '+' : '−'} R$ ${fmt(b.valor)}</td>
+    </tr>`;
+  });
+
+  const liquido = totalServ + totalBonus - totalAjuste;
+
+  const secBonus = bonusTec.length ? `
+    <div class="sec-title">Bônus e Descontos</div>
+    <table>
+      <thead><tr><th style="width:22%">Tipo</th><th>Descrição / Justificativa</th><th class="num" style="width:18%">Valor</th></tr></thead>
+      <tbody>${linhasBonus}</tbody>
+    </table>` : '';
+
+  const hoje = new Date();
+  const dataEmissao = `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`;
+
+  return `<div class="recibo">
+    <h2>Comprovante de Comissão — ${tec}</h2>
+    <div class="rec-sub">Documento de conferência dos serviços realizados e valores devidos.</div>
+
+    <div class="rec-info">
+      <div><b>Técnico:</b> ${tec}</div>
+      <div><b>Período:</b> ${periodo || '—'}</div>
+      <div><b>Lançamentos:</b> ${lancs.length}</div>
+      <div><b>Emitido em:</b> ${dataEmissao}</div>
+    </div>
+
+    <div class="sec-title">Serviços Realizados</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th><th>O.S.</th><th>Serviço</th><th>Local</th>
+          <th class="num">Qtd</th><th class="num">Valor Total</th>
+          <th class="num">Técnicos</th><th class="num">A pagar</th>
+        </tr>
+      </thead>
+      <tbody>${linhasServ}</tbody>
+    </table>
+
+    ${secBonus}
+
+    <div class="totais">
+      <div class="lin"><span>Subtotal dos serviços</span><b>R$ ${fmt(totalServ)}</b></div>
+      <div class="lin"><span>Bônus</span><b class="pos">+ R$ ${fmt(totalBonus)}</b></div>
+      <div class="lin"><span>Descontos / Ajustes</span><b class="neg">− R$ ${fmt(totalAjuste)}</b></div>
+      <div class="lin liquido"><span>TOTAL LÍQUIDO A PAGAR</span><span>R$ ${fmt(liquido)}</span></div>
+    </div>
+
+    <div class="declaracao">
+      Declaro que conferi os serviços listados acima e concordo com os valores, bônus e descontos apresentados neste comprovante.
+    </div>
+
+    <div class="assin">
+      <div class="box">
+        <div class="linha"></div>
+        Assinatura do Técnico<br><b>${tec}</b>
+      </div>
+      <div class="box">
+        <div class="linha"></div>
+        Responsável / Supervisor
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderComprovantes() {
+  const area = document.getElementById('print-area');
+  if (!area) return;
+  const sel = document.getElementById('rec-tec');
+  const periodo = document.getElementById('rec-periodo').value.trim() ||
+                  document.getElementById('badge-mes').textContent;
+  const alvo = sel.value;
+
+  let tecs;
+  if (alvo === '__ALL__') {
+    const ativos = new Set();
+    lancamentos.forEach(l => l.tecsPart.forEach(t => ativos.add(t)));
+    bonusList.forEach(b => ativos.add(b.tec));
+    tecs = Array.from(ativos).sort();
+  } else {
+    tecs = [alvo];
+  }
+
+  if (!tecs.length) {
+    area.innerHTML = `<div class="recibo"><div style="text-align:center; color:#666; padding:24px;">Nenhum técnico com lançamentos ou bônus.</div></div>`;
+    return;
+  }
+
+  area.innerHTML = tecs.map(t => buildReciboHTML(t, periodo)).join('');
+}
+
+
+// ════════════════════════════════════════════════════════════════════════
+// BÔNUS
+// ════════════════════════════════════════════════════════════════════════
+
+function addBonus() {
+  const tec   = document.getElementById('b-tec').value;
+  const tipo  = document.getElementById('b-tipo').value;
+  const desc  = document.getElementById('b-desc').value.trim();
+  const valor = parseFloat(document.getElementById('b-valor').value);
+
+  if (!tec || !desc || isNaN(valor) || valor <= 0) {
+    toast('Preencha técnico, descrição e valor.', true); return;
+  }
+
+  bonusList.push({ id: Date.now(), tec, tipo, desc, valor });
+  document.getElementById('b-desc').value = '';
+  document.getElementById('b-valor').value = '';
+  renderBonus();
+  saveState();
+  toast('Registrado!');
+}
+
+function removeBonus(id) {
+  bonusList = bonusList.filter(b => b.id !== id);
+  renderBonus();
+  saveState();
+}
+
+function renderBonus() {
+  const tbody = document.getElementById('tbody-bonus');
+  if (!bonusList.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">⭐</div>Nenhum bônus ou ajuste registrado.</div></td></tr>`;
+  } else {
+    tbody.innerHTML = bonusList.map(b => `<tr>
+      <td><strong style="color:var(--text);">${b.tec}</strong></td>
+      <td><span class="pill ${b.tipo === 'BONUS' ? 'pill-green' : 'pill-red'}">${b.tipo}</span></td>
+      <td>${b.desc}</td>
+      <td class="num ${b.tipo === 'BONUS' ? 'pos' : 'neg'}">${b.tipo === 'BONUS' ? '+' : '-'} R$ ${fmt(b.valor)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="removeBonus(${b.id})">✕</button></td>
+    </tr>`).join('');
+  }
+
+  const totalBon  = bonusList.filter(b => b.tipo === 'BONUS').reduce((s,b) => s + b.valor, 0);
+  const totalAjus = bonusList.filter(b => b.tipo === 'AJUSTE').reduce((s,b) => s + b.valor, 0);
+  const liquido   = totalBon - totalAjus;
+  document.getElementById('total-bonus').textContent   = 'R$ ' + fmt(totalBon);
+  document.getElementById('total-ajustes').textContent = 'R$ ' + fmt(totalAjus);
+  document.getElementById('total-liquido').textContent = 'R$ ' + fmt(liquido);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// IMPORTAÇÃO EM MASSA
+// ════════════════════════════════════════════════════════════════════════
+
+let impHeaders = [];   // cabeçalhos detectados na planilha
+let impRawRows = [];   // linhas brutas (array de arrays)
+let impMapping = {};   // { campo: índice da coluna, -1 = não usar }
+let impServicoFix = {}; // { 'texto bruto da planilha': 'CHAVE_SERVICO' | '' }
+let impTecFix = {};     // { 'texto bruto da planilha': 'Nome padronizado' | '__novo__' | '' }
+let impParsed = [];     // linhas já processadas, prontas para prévia/importação
+
+const IMP_FIELDS = [
+  { key: 'data',         label: 'Data',                                required: true  },
+  { key: 'os',           label: 'Cód. O.S.',                           required: false },
+  { key: 'local',        label: 'Nome / Local',                        required: false },
+  { key: 'origem',       label: 'Origem (Provedor / Condomínio)',      required: false },
+  { key: 'tipo',         label: 'Tipo de O.S.',                        required: false },
+  { key: 'servico',      label: 'Serviço',                             required: true  },
+  { key: 'qtd',          label: 'Qtd (para NAP/Emenda/Bandeja)',       required: false },
+  { key: 'tecPrincipal', label: 'Técnico Principal',                   required: true  },
+  { key: 'ajudantes',    label: 'Ajudantes (separados por vírgula)',   required: false },
+];
+
+function normTxt(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function handleImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'binary', cellDates: true });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
+      if (!rows.length) { toast('Planilha vazia.', true); return; }
+      impHeaders = rows[0].map(h => String(h || '').trim());
+      impRawRows = rows.slice(1).filter(r => r.some(c => String(c).trim() !== ''));
+      document.getElementById('imp-file-info').textContent =
+        `${file.name} — ${impRawRows.length} linha(s) de dados, ${impHeaders.length} coluna(s) detectada(s) na aba "${wb.SheetNames[0]}".`;
+      document.getElementById('imp-fix-card').style.display = 'none';
+      document.getElementById('imp-preview-card').style.display = 'none';
+      buildMappingUI();
+    } catch (err) {
+      toast('Não foi possível ler o arquivo: ' + err.message, true);
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function buildMappingUI() {
+  const KEYWORDS = {
+    data: ['data'],
+    os: ['os', 'ordem de servico', 'codigo'],
+    local: ['local', 'nome', 'cliente', 'endereco'],
+    origem: ['origem'],
+    tipo: ['tipo'],
+    servico: ['servico'],
+    qtd: ['qtd', 'quantidade'],
+    tecPrincipal: ['tecnico principal', 'tecnico', 'responsavel'],
+    ajudantes: ['ajudante', 'participante', 'apoio'],
+  };
+
+  const grid = document.getElementById('imp-map-grid');
+  grid.innerHTML = '';
+  impMapping = {};
+
+  IMP_FIELDS.forEach(f => {
+    let guess = -1;
+    const kws = KEYWORDS[f.key] || [];
+    for (let i = 0; i < impHeaders.length; i++) {
+      const h = normTxt(impHeaders[i]);
+      if (kws.some(k => h.includes(k))) { guess = i; break; }
+    }
+    impMapping[f.key] = guess;
+
+    const label = document.createElement('label');
+    label.textContent = f.label + (f.required ? ' *' : '');
+    const sel = document.createElement('select');
+    sel.id = 'imp-map-' + f.key;
+    sel.innerHTML = '<option value="-1">— não usar —</option>' +
+      impHeaders.map((h, i) => `<option value="${i}">${h || ('coluna ' + (i + 1))}</option>`).join('');
+    sel.value = String(guess);
+    sel.onchange = () => { impMapping[f.key] = parseInt(sel.value); };
+    grid.appendChild(label);
+    grid.appendChild(sel);
+  });
+
+  document.getElementById('imp-map-card').style.display = '';
+}
+
+function matchServico(raw) {
+  const r = normTxt(raw);
+  if (!r) return null;
+  for (const key of Object.keys(VALORES_FIXOS)) if (normTxt(key) === r) return key;
+  for (const [key, v] of Object.entries(VALORES_FIXOS)) if (normTxt(v.desc) === r) return key;
+  const progExato = PROGRESSIVOS.find(p => normTxt(p) === r);
+  if (progExato) return progExato;
+  if (r.includes('nap')) return 'NAP';
+  if (r.includes('emenda')) return 'EMENDA';
+  if (r.includes('bandeja')) return 'BANDEJA';
+  for (const [key, v] of Object.entries(VALORES_FIXOS)) {
+    const d = normTxt(v.desc);
+    if (r.includes(d) || d.includes(r)) return key;
+  }
+  return null;
+}
+
+function matchTecnico(raw) {
+  const r = normTxt(raw);
+  if (!r) return null;
+  return TECNICOS.find(t => normTxt(t) === r) || null;
+}
+
+function parseDataCell(raw) {
+  if (!raw) return null;
+  const s = String(raw).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+  if (m) {
+    let [, d, mo, y] = m;
+    if (y.length === 2) y = '20' + y;
+    return `${y}-${mo.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+  return null;
+}
+
+function resolverOrigem(raw) {
+  const s = normTxt(raw);
+  if (s.includes('cond')) return 'Condomínio / O.S. Externa';
+  if (s.includes('prov')) return 'Provedor';
+  return raw ? String(raw).trim() : 'Provedor';
+}
+
+function analisarImportacao() {
+  if (impMapping.data === -1 || impMapping.servico === -1 || impMapping.tecPrincipal === -1) {
+    toast('Mapeie ao menos: Data, Serviço e Técnico Principal.', true); return;
+  }
+
+  const servicosNaoReconhecidos = new Set();
+  const tecsNaoReconhecidos = new Set();
+
+  impRawRows.forEach(row => {
+    const rawServ = row[impMapping.servico];
+    if (rawServ && !matchServico(rawServ)) servicosNaoReconhecidos.add(String(rawServ).trim());
+    const rawTec = row[impMapping.tecPrincipal];
+    if (rawTec && !matchTecnico(rawTec)) tecsNaoReconhecidos.add(String(rawTec).trim());
+    if (impMapping.ajudantes !== -1 && row[impMapping.ajudantes]) {
+      String(row[impMapping.ajudantes]).split(/[,;]/).map(s => s.trim()).filter(Boolean).forEach(n => {
+        if (!matchTecnico(n)) tecsNaoReconhecidos.add(n);
+      });
+    }
+  });
+
+  const fixCard = document.getElementById('imp-fix-card');
+  const fixBody = document.getElementById('imp-fix-body');
+  let html = '';
+
+  if (servicosNaoReconhecidos.size) {
+    const opts = [
+      ...Object.entries(VALORES_FIXOS).map(([k, v]) => [k, v.desc]),
+      ...PROGRESSIVOS.map(p => [p, p]),
+    ];
+    html += '<div class="card-title" style="margin-top:0;">Serviços não reconhecidos</div><div class="map-grid">';
+    [...servicosNaoReconhecidos].forEach(v => {
+      html += `<label>"${v}"</label><select class="fix-select" data-fix-tipo="servico" data-fix-valor="${encodeURIComponent(v)}" onchange="gerarPreview()">
+        <option value="">— ignorar linhas com este valor —</option>
+        ${opts.map(([k, d]) => `<option value="${k}">${d}</option>`).join('')}
+      </select>`;
+    });
+    html += '</div>';
+  }
+
+  if (tecsNaoReconhecidos.size) {
+    html += '<div class="card-title" style="margin-top:16px;">Técnicos não reconhecidos</div><div class="map-grid">';
+    [...tecsNaoReconhecidos].forEach(v => {
+      html += `<label>"${v}"</label><select class="fix-select" data-fix-tipo="tecnico" data-fix-valor="${encodeURIComponent(v)}" onchange="gerarPreview()">
+        <option value="__novo__">Cadastrar como novo técnico "${v}"</option>
+        <option value="">— ignorar linhas com este valor —</option>
+        ${TECNICOS.map(t => `<option value="${t}">${t}</option>`).join('')}
+      </select>`;
+    });
+    html += '</div>';
+  }
+
+  fixBody.innerHTML = html;
+  fixCard.style.display = html ? '' : 'none';
+
+  gerarPreview();
+}
+
+function coletarFixes() {
+  impServicoFix = {}; impTecFix = {};
+  document.querySelectorAll('#imp-fix-body select[data-fix-tipo="servico"]').forEach(sel => {
+    impServicoFix[decodeURIComponent(sel.dataset.fixValor)] = sel.value;
+  });
+  document.querySelectorAll('#imp-fix-body select[data-fix-tipo="tecnico"]').forEach(sel => {
+    impTecFix[decodeURIComponent(sel.dataset.fixValor)] = sel.value;
+  });
+}
+
+function resolverServico(raw) {
+  const m = matchServico(raw);
+  if (m) return m;
+  const fixed = impServicoFix[String(raw || '').trim()];
+  return fixed || null;
+}
+
+function resolverTecnico(raw) {
+  const m = matchTecnico(raw);
+  if (m) return m;
+  const key = String(raw || '').trim();
+  const fixed = impTecFix[key];
+  if (fixed === '__novo__') return key;
+  return fixed || null;
+}
+
+function gerarPreview() {
+  coletarFixes();
+  impParsed = [];
+
+  // ordena por data para os progressivos (NAP/Emenda/Bandeja) acumularem corretamente
+  const comIndice = impRawRows.map((row, i) => ({ row, i }));
+  comIndice.sort((a, b) => {
+    const da = parseDataCell(a.row[impMapping.data]) || '';
+    const db = parseDataCell(b.row[impMapping.data]) || '';
+    return da.localeCompare(db);
+  });
+
+  const acumuloTemp = {};
+
+  comIndice.forEach(({ row, i }) => {
+    const errors = [];
+
+    const data = parseDataCell(row[impMapping.data]);
+    if (!data) errors.push('data inválida');
+
+    const servicoRaw = impMapping.servico !== -1 ? row[impMapping.servico] : '';
+    const servico = resolverServico(servicoRaw);
+    if (!servico) errors.push('serviço não mapeado');
+
+    const tecRaw = impMapping.tecPrincipal !== -1 ? row[impMapping.tecPrincipal] : '';
+    const tecPrincipal = resolverTecnico(tecRaw);
+    if (!tecPrincipal) errors.push('técnico não mapeado');
+
+    let ajudantes = [];
+    if (impMapping.ajudantes !== -1 && row[impMapping.ajudantes]) {
+      ajudantes = String(row[impMapping.ajudantes]).split(/[,;]/).map(s => s.trim()).filter(Boolean)
+        .map(resolverTecnico).filter(Boolean);
+    }
+
+    const qtd = impMapping.qtd !== -1 ? (parseInt(row[impMapping.qtd]) || 1) : 1;
+    const os = impMapping.os !== -1 ? String(row[impMapping.os] || '').trim() : '';
+    const local = impMapping.local !== -1 ? String(row[impMapping.local] || '').trim() : '';
+    const origem = impMapping.origem !== -1 ? resolverOrigem(row[impMapping.origem]) : 'Provedor';
+    const tipo = impMapping.tipo !== -1 ? String(row[impMapping.tipo] || '').trim() : '';
+
+    let valorUnit = 0, valorTotal = 0, faixa = '—';
+    if (errors.length === 0) {
+      if (VALORES_FIXOS[servico]) {
+        valorUnit = VALORES_FIXOS[servico].valor;
+        valorTotal = valorUnit;
+      } else if (PROGRESSIVOS.includes(servico)) {
+        const chave = `${tecPrincipal}|${data}|${servico}`;
+        const acumAntes = acumuloTemp[chave] || 0;
+        const faixaInfo = getProgFaixa(acumAntes + qtd);
+        valorUnit = faixaInfo.valor;
+        valorTotal = valorUnit * qtd;
+        faixa = faixaInfo.label;
+        acumuloTemp[chave] = acumAntes + qtd;
+      }
+    }
+
+    impParsed.push({
+      linha: i + 2, ok: errors.length === 0, errors,
+      data, os, local, origem, tipo, servico, qtd,
+      tecPrincipal, ajudantes, valorUnit, valorTotal, faixa,
+    });
+  });
+
+  renderPreview();
+}
+
+function renderPreview() {
+  const body = document.getElementById('imp-preview-body');
+  const ok = impParsed.filter(p => p.ok);
+  const bad = impParsed.filter(p => !p.ok);
+
+  body.innerHTML = impParsed.map(p => `<tr>
+    <td>${p.linha}</td>
+    <td class="${p.ok ? 'status-ok' : 'status-warn'}">${p.ok ? '✔ OK' : '⚠ ' + p.errors.join(', ')}</td>
+    <td>${p.data ? fmtDate(p.data) : '—'}</td>
+    <td>${p.servico ? (VALORES_FIXOS[p.servico]?.desc || p.servico) : (p.errors.length ? '—' : p.servico)}</td>
+    <td class="num">${p.qtd}</td>
+    <td>${p.tecPrincipal || '—'}</td>
+    <td class="num">${p.ok ? 'R$ ' + fmt(p.valorTotal) : '—'}</td>
+  </tr>`).join('');
+
+  document.getElementById('imp-summary').textContent =
+    `${ok.length} linha(s) prontas para importar · ${bad.length} com pendência`;
+  document.getElementById('imp-preview-card').style.display = '';
+}
+
+function confirmarImportacao() {
+  const validas = impParsed.filter(p => p.ok);
+  if (!validas.length) { toast('Nenhuma linha válida para importar.', true); return; }
+
+  // detecta O.S. que já existem no sistema OU que se repetem dentro do próprio arquivo
+  const osExistentes = new Set(lancamentos.filter(l => l.os).map(l => String(l.os).trim().toLowerCase()));
+  const osNoArquivo = new Set();
+  const osDuplicadas = new Set();
+  validas.forEach(p => {
+    const osNorm = String(p.os || '').trim().toLowerCase();
+    if (!osNorm) return;
+    if (osExistentes.has(osNorm) || osNoArquivo.has(osNorm)) osDuplicadas.add(String(p.os).trim());
+    osNoArquivo.add(osNorm);
+  });
+
+  if (osDuplicadas.size) {
+    const lista = [...osDuplicadas].slice(0, 15).join(', ') + (osDuplicadas.size > 15 ? '…' : '');
+    const continuar = confirm(
+      `${osDuplicadas.size} O.S. desta importação já existe(m) no sistema ou aparece(m) repetida(s) no próprio arquivo:\n${lista}\n\n` +
+      `Se continuar, essas O.S. serão lançadas de novo (pode gerar comissão em dobro). Deseja continuar mesmo assim?`
+    );
+    if (!continuar) { toast('Importação cancelada.', true); return; }
+  }
+
+  // cadastra automaticamente técnicos novos escolhidos na etapa de correção
+  const novos = new Set();
+  validas.forEach(p => {
+    if (!TECNICOS.includes(p.tecPrincipal)) novos.add(p.tecPrincipal);
+    p.ajudantes.forEach(a => { if (!TECNICOS.includes(a)) novos.add(a); });
+  });
+  if (novos.size) {
+    novos.forEach(n => TECNICOS.push(n));
+    ['b-tec', 'rec-tec'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      novos.forEach(n => {
+        const opt = document.createElement('option');
+        opt.value = n; opt.textContent = n;
+        sel.appendChild(opt);
+      });
+    });
+    // atualiza também os selects dinâmicos de técnicos já visíveis no formulário
+    document.querySelectorAll('.f-tec-select').forEach(sel => {
+      novos.forEach(n => {
+        if (!Array.from(sel.options).find(o => o.value === n)) {
+          const opt = document.createElement('option');
+          opt.value = n; opt.textContent = n;
+          sel.appendChild(opt);
+        }
+      });
+    });
+  }
+
+  validas.forEach(p => {
+    const tecsPart = [p.tecPrincipal, ...p.ajudantes];
+    const valorRateado = p.valorTotal / tecsPart.length;
+    lancamentos.push({
+      id: Date.now() + Math.random(),
+      data: p.data, os: p.os, local: p.local, origem: p.origem || 'Provedor', tipo: p.tipo,
+      servico: p.servico, qtd: p.qtd, tecsPart,
+      valorUnit: p.valorUnit, valorTotal: p.valorTotal, valorRateado, faixa: p.faixa,
+    });
+  });
+
+  recomputeProgressivos();
+  renderLancamentos();
+  saveState();
+  toast(`${validas.length} lançamento(s) importado(s) com sucesso!`);
+  showTab('lancamentos');
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// UTILITÁRIOS
+// ════════════════════════════════════════════════════════════════════════
+
+function fmt(n) {
+  return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+let toastTimer;
+function toast(msg, isError = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = isError ? 'var(--danger)' : 'var(--accent2)';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// START
+// ════════════════════════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
