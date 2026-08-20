@@ -1,0 +1,43 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [
+    "server",
+    "db",
+    "user"
+  ],
+  "dev_command": "pnpm run dev",
+  "env_vars": {
+    "DATABASE_URL": "mysql://3YqntwW8xGhEtTn.5bf2831ace62:V6bA29H4VOnxVsB3lA4e@gateway04.us-east-1.prod.aws.tidbcloud.com:4000/iUfv7baF5X8uKwNRx83iQt?ssl={\"rejectUnauthorized\":true}"
+  },
+  "experiments": [
+    "no_db_push"
+  ],
+  "git_remote": {
+    "repo_url": "s3://vida-prod-gitrepo/webdev-git/310519663453135481/iUfv7baF5X8uKwNRx83iQt",
+    "access_key_id": "ASIAZV3A2ECZASDCNHI4",
+    "secret_access_key": "0akLftZ0l/FSZyW1A/a5mvDBw3YiYg5ZIhCzEkGo",
+    "session_token": "IQoJb3JpZ2luX2VjELH//////////wEaCXVzLWVhc3QtMSJIMEYCIQD6VDeOelifLgcMjXKveMHvWFeK2j+0rFQTaehzI2OuqwIhAIdECynAxRIMR3ZiEu+Q+x1kHRmg9PbC0CBmOsTtcrTIKvYDCHoQBBoMNjY1Mzg2MDk4ODY2IgzvdPYYxwVuPFwuXBwq0wMalp0bWCOcqqE9qEKeE5XdtGIBObZwIbawl3W3nmuR4AZmiZKzrolNs8+l0KtEelnffFzU9ajGKk7YSTT3ynSvvj45pK99d5Vi+VQWIFusyBpR8ADINdn39l3tv7Ah/yBeJm6NDrhH/lqH2g8HA8mmUqn40ff3GyeJBRXehd2o+iPQe0sf1K64jUOsLeGTEhozdnQS4e5Ef5tOd9QJXZyivO0JVeMDIxFjwY06mOxem9W4904OUlR4yue+nQv5wOX9LLlVHrgiGzMuSzx4STRcpcqOEsLW2nKnhNtMUGh6q5PECDFfy9QZkCJeaERphW2mfxIBBDqrnCBT0SCJSMNBtaKGIK+zynHskKxdiZfnHoTuxCpGkqC/AWqSdxfQEtLSJA8ou9lnKZl7tsnsHGy5WHnlmPHoDg9SkrMBTdQBpT3hlyvxW9EW5KYbKj/hsDsJKrBxa/tX21ZtDINdptjsX2DaNZw7MP3SQ2uhTWfft39/9pDSfh62xqenMvy+wTSkPBkIGDHwV9Dd1yAFFewvbxr2GuD3QPBHGiAY7cbgP5L7vj+aFPwGI3TCyCJto1y+x0fsHHKazURCvKccN4DBydxFuL7Y3YcbQ75XJDsUui21CjDYm53QBjqcAetlxGC4yYlR2ANgDztm5BwlUmymwuyCinIadkgGA3iA2hUYVc0WIzU89A/YVfi7EQNNzgzfPPU69l00ViU9V9mSvBpu6f/62su8dwegOcXh5Polc7hfj8lGa6iOWxxJDnM8AbRWCca9cIFxBaPEzrrPILs0RGhEwFjecszH8ry731Wf759bFTtq1xrGPEG4lniCCuI6y68EopXH9g==",
+    "expiration": "2026-05-16T04:46:16.000Z"
+  },
+  "name": "inventory-system",
+  "path": "/home/ubuntu/inventory-system",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "FLTmuyJRQkgSz6uSMoZgva",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "JWT_SECRET": "VdFxTiDMYG3wRUHsnKD3XN",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "Danilo Oliveira",
+    "OWNER_OPEN_ID": "jyC8UHfqVYwYbwtbhdRmhP",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "0a369e21-680d-4db4-a99d-19fd9f20510e",
+    "VITE_APP_ID": "iUfv7baF5X8uKwNRx83iQt",
+    "VITE_APP_LOGO": "",
+    "VITE_APP_TITLE": "Sistema de Controle de Inventário",
+    "VITE_FRONTEND_FORGE_API_KEY": "Ugb93mNNfSzWRksCwWJa9c",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im"
+  },
+  "template_id": "web-db-user",
+  "test_command": "pnpm test"
+}
